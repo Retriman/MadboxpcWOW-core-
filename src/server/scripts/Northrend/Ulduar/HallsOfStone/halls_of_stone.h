@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -53,8 +53,8 @@ enum Creatures
 enum GameObjects
 {
     GO_ABEDNEUM                                            = 191669,
-    GO_MARNAK                                              = 192170,
-    GO_KADDRAK                                             = 192171,
+    GO_MARNAK                                              = 191670,
+    GO_KADDRAK                                             = 191671,
     GO_MAIDEN_DOOR                                         = 191292,
     GO_BRANN_DOOR                                          = 191295,
     GO_SJONNIR_DOOR                                        = 191296,
