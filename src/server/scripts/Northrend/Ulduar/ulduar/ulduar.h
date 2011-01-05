@@ -18,60 +18,67 @@
 #ifndef DEF_ULDUAR_H
 #define DEF_ULDUAR_H
 
-enum eTypes
+enum Encounter
 {
-    MAX_ENCOUNTER               = 15,
-
-    TYPE_LEVIATHAN              = 0,
-    TYPE_IGNIS                  = 1,
-    TYPE_RAZORSCALE             = 2,
-    TYPE_XT002                  = 3,
-    TYPE_ASSEMBLY               = 4,
-    TYPE_KOLOGARN               = 5,
-    TYPE_AURIAYA                = 6,
-    TYPE_MIMIRON                = 7,
-    TYPE_HODIR                  = 8,
-    TYPE_THORIM                 = 9,
-    TYPE_FREYA                  = 10,
-    TYPE_VEZAX                  = 11,
-    TYPE_YOGGSARON              = 12,
-    TYPE_ALGALON                = 13,
-    TYPE_COLOSSUS               = 14,
-
-    DATA_STEELBREAKER           = 20,
-    DATA_MOLGEIM                = 21,
-    DATA_BRUNDIR                = 22,
-
-    DATA_EXP_COMMANDER          = 25,
-
-
-    NPC_LEVIATHAN               = 33113,
-    NPC_IGNIS                   = 33118,
-    NPC_RAZORSCALE              = 33186,
-    NPC_EXPEDITION_COMMANDER    = 33210,
-    NPC_XT002                   = 33293,
-    NPC_STEELBREAKER            = 32867,
-    NPC_MOLGEIM                 = 32927,
-    NPC_BRUNDIR                 = 32857,
-    NPC_KOLOGARN                = 32930,
-    NPC_AURIAYA                 = 33515,
-    NPC_MIMIRON                 = 33350,
-    NPC_HODIR                   = 32845,
-    NPC_THORIM                  = 32865,
-    NPC_FREYA                   = 32906,
-    NPC_VEZAX                   = 33271,
-    NPC_YOGGSARON               = 33288,
-    NPC_ALGALON                 = 32871,
-
-    EVENT_TOWER_OF_STORM_DESTROYED     = 21031,
-    EVENT_TOWER_OF_FROST_DESTROYED     = 21032,
-    EVENT_TOWER_OF_FLAMES_DESTROYED    = 21033,
-    EVENT_TOWER_OF_LIFE_DESTROYED      = 21030
+    BOSS_LEVIATHAN,
+    BOSS_IGNIS,
+    BOSS_RAZORSCALE,
+    BOSS_XT002,
+    BOSS_ASSEMBLY,
+    BOSS_KOLOGARN,
+    BOSS_AURIAYA,
+    BOSS_MIMIRON,
+    BOSS_HODIR,
+    BOSS_THORIM,
+    BOSS_FREYA,
+    BOSS_VEZAX,
+    BOSS_YOGGSARON,
+    BOSS_ALGALON,
+    MAX_BOSS_NUMBER
 };
 
-enum eAchievementCriteria
+enum Data64
 {
-    ACHIEVEMENT_CRITERIA_HOT_POCKET_10                   = 10430, //ignis
-    ACHIEVEMENT_CRITERIA_HOT_POCKET_25                   = 10431,
+    DATA_LEVIATHAN,
+    DATA_NORGANNON,
+    DATA_IGNIS,
+    DATA_RAZORSCALE,
+    DATA_EXP_COMMANDER,
+    DATA_XT002,
+    DATA_STEELBREAKER,
+    DATA_MOLGEIM,
+    DATA_BRUNDIR,
+    DATA_KOLOGARN,
+    DATA_AURIAYA,
+    DATA_BRIGHTLEAF,
+    DATA_IRONBRANCH,
+    DATA_STONEBARK,
+    DATA_FREYA,
+    DATA_THORIM,
+    DATA_RUNIC_COLOSSUS,
+    DATA_RUNE_GIANT,
+    DATA_MIMIRON,
+    DATA_LEVIATHAN_MK_II,
+    DATA_VX_001,
+    DATA_AERIAL_UNIT,
+    DATA_MAGNETIC_CORE,
+    DATA_VEZAX,
+    DATA_YS_FREYA,
+    DATA_YS_THORIM,
+    DATA_YS_MIMIRON,
+    DATA_YS_HODIR,
+    DATA_YOGGSARON_BRAIN,
+    DATA_YOGGSARON
 };
+
+enum Data
+{
+    DATA_LEVIATHAN_DOOR,
+    DATA_RUNIC_DOOR,
+    DATA_STONE_DOOR,
+    DATA_CALL_TRAM,
+    DATA_MIMIRON_ELEVATOR,
+    DATA_HODIR_RARE_CHEST
+};
+
 #endif

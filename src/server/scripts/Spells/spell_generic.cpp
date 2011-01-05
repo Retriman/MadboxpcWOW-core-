@@ -635,6 +635,218 @@ public:
     }
 };
 
+// 66313 Fire Bomb
+enum FireBombNPC
+{
+    NPC_FIRE_BOMB           = 34854,
+};
+
+class spell_gen_fire_bomb : public SpellScriptLoader
+{
+public:
+    spell_gen_fire_bomb() : SpellScriptLoader("spell_gen_fire_bomb") { }
+
+    class spell_gen_fire_bomb_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_fire_bomb_SpellScript)
+
+        void HandleAfterHit()
+        {
+            Unit* caster = GetCaster();
+            if (WorldLocation * pos = GetTargetDest())
+                caster->SummonCreature(NPC_FIRE_BOMB, pos->GetPositionX(), pos->GetPositionY(), pos->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 60000);
+        }
+
+        void Register()
+        {
+            AfterHit += SpellHitFn(spell_gen_fire_bomb_SpellScript::HandleAfterHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_gen_fire_bomb_SpellScript();
+    }
+};
+
+// 63382 Rapid Burst
+enum RapidBurstSpells
+{
+    SPELL_RAPID_BURST_NORMAL_L  = 63387,
+    SPELL_RAPID_BURST_NORMAL_R  = 64019,
+    SPELL_RAPID_BURST_HEROIC_L  = 64531,
+    SPELL_RAPID_BURST_HEROIC_R  = 64532,
+};
+
+class spell_gen_rapid_burst : public SpellScriptLoader
+{
+public:
+    spell_gen_rapid_burst() : SpellScriptLoader("spell_gen_rapid_burst") { }
+
+    class spell_gen_rapid_burst_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_gen_rapid_burst_AuraScript)
+
+    private:
+        int m_step;
+
+    public:
+        spell_gen_rapid_burst_AuraScript() : m_step(0) { }
+
+        void HandleEffectPeriodic(AuraEffect const * /*aurEff*/)
+        {
+            uint32 spell_l;
+            uint32 spell_r;
+            if (Unit* caster = GetCaster())
+            {
+                if (caster->GetMap()->GetSpawnMode() == RAID_DIFFICULTY_25MAN_NORMAL) {
+                    spell_l = SPELL_RAPID_BURST_HEROIC_L;
+                    spell_r = SPELL_RAPID_BURST_HEROIC_R;
+                }
+                else {
+                    spell_l = SPELL_RAPID_BURST_NORMAL_L;
+                    spell_r = SPELL_RAPID_BURST_NORMAL_R;
+                }
+
+                if (Unit* target = GetTarget())
+                {
+                    if (m_step == 0) {
+                        caster->CastSpell(target, spell_l, true);
+                        m_step = 1;
+                    }
+                    else if (m_step == 1) {
+                        caster->CastSpell(target, spell_r, true);
+                        m_step = 0;
+                    }
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_rapid_burst_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_gen_rapid_burst_AuraScript();
+    }
+};
+
+// 62038 Biting Cold - Hodir's Aura
+enum BitingColdSpells
+{
+    SPELL_BITING_COLD_AURA   = 62038,
+    SPELL_BITING_COLD_DOT    = 62039,
+    SPELL_BITING_COLD_DAMAGE = 62188,
+};
+
+class spell_gen_biting_cold : public SpellScriptLoader
+{
+public:
+    spell_gen_biting_cold() : SpellScriptLoader("spell_gen_biting_cold") { }
+
+    class spell_gen_biting_cold_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_gen_biting_cold_AuraScript)
+
+    private:
+        // GUID - Stopped Count
+        typedef std::list< std::pair<uint64, uint8> > TargetList;
+        TargetList target_list;
+
+    public:
+        spell_gen_biting_cold_AuraScript() { }
+
+        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        {
+            if (Unit* caster = GetCaster())
+                if (Unit* target = GetTarget())
+                {
+                    // Should affect only Players
+                    if (target->GetTypeId() != TYPEID_PLAYER)
+                        return;
+                    bool found = false;
+                    // Search Target
+                    for (TargetList::iterator itr = target_list.begin(); itr != target_list.end(); ++itr)
+                    {
+                        if (itr->first == target->GetGUID())
+                        {
+                            // Target has not been moving for 4 seconds
+                            if (itr->second >= 4)
+                            {
+                                target->CastSpell(target, SPELL_BITING_COLD_DOT, true);
+                                itr->second = 1;
+                            }
+                            else
+                            {
+                                if (target->isMoving())
+                                    // If target is moving reset the counter
+                                    itr->second = 1;
+                                else
+                                    itr->second++;
+                            }
+                            found = true;
+                            break;
+                        }
+                    }
+                    // If no target is found then add target to the list
+                    if (!found)
+                        target_list.push_back(std::make_pair(target->GetGUID(), 1));
+                }
+        }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_biting_cold_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_gen_biting_cold_AuraScript();
+    }
+};
+
+// 62039 Biting Cold - DOT
+class spell_gen_biting_cold_dot : public SpellScriptLoader
+{
+public:
+    spell_gen_biting_cold_dot() : SpellScriptLoader("spell_gen_biting_cold_dot") { }
+
+    class spell_gen_biting_cold_dot_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_gen_biting_cold_dot_AuraScript)
+
+    public:
+        spell_gen_biting_cold_dot_AuraScript() { }
+
+        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                int32 damage = 200 * (1 << GetStackAmount());
+                caster->CastCustomSpell(caster, SPELL_BITING_COLD_DAMAGE, &damage, NULL, NULL, true);
+
+                if (caster->isMoving())
+                    caster->RemoveAuraFromStack(SPELL_BITING_COLD_DOT);
+            }
+        }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_biting_cold_dot_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_gen_biting_cold_dot_AuraScript();
+    }
+};
+
+
 void AddSC_generic_spell_scripts()
 {
     new spell_gen_absorb0_hitlimit1();
@@ -651,4 +863,8 @@ void AddSC_generic_spell_scripts()
     new spell_gen_animal_blood();
     new spell_gen_shroud_of_death();
     new spell_gen_divine_storm_cd_reset();
+    new spell_gen_fire_bomb();
+    new spell_gen_rapid_burst();
+    new spell_gen_biting_cold();
+    new spell_gen_biting_cold_dot();
 }
