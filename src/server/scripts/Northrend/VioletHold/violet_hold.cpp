@@ -441,6 +441,9 @@ public:
         bool bHasGotMovingPoints;
         uint32 uiBoss;
 
+        void AttackStart(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) {}
+
         void Reset()
         {
             if (pInstance && !uiBoss)
@@ -792,7 +795,7 @@ struct violet_hold_trashAI : public npc_escortAI
 
     void CreatureStartAttackDoor()
     {
-        me->SetReactState(REACT_PASSIVE);
+        //me->SetReactState(REACT_PASSIVE);
         DoCast(SPELL_DESTROY_DOOR_SEAL);
         if (pInstance)
             pInstance->SetData(DATA_NPC_PRESENCE_AT_DOOR_ADD,1);

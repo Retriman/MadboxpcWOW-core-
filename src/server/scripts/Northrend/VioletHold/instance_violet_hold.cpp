@@ -206,6 +206,7 @@ public:
             uiCountErekemGuards = 0;
             uiCountActivationCrystals = 0;
             uiCyanigosaEventPhase = 1;
+            uiMainEventPhase = NOT_STARTED;
 
             uiActivationTimer = 5000;
             uiDoorSpellTimer = 2000;
@@ -315,14 +316,20 @@ public:
             switch(type)
             {
                 case DATA_1ST_BOSS_EVENT:
-                    m_auiEncounter[0] = data;
-                    if (data == DONE)
-                        SaveToDB();
+                    if(m_auiEncounter[0] != DONE)
+                    {
+                        m_auiEncounter[0] = data;
+                        if (data == DONE)
+                            SaveToDB();
+                    }
                     break;
                 case DATA_2ND_BOSS_EVENT:
-                    m_auiEncounter[1] = data;
-                    if (data == DONE)
-                        SaveToDB();
+                    if(m_auiEncounter[1] != DONE)
+                    {
+                        m_auiEncounter[1] = data;
+                        if (data == DONE)
+                            SaveToDB();
+                    }
                     break;
                 case DATA_CYANIGOSA_EVENT:
                     m_auiEncounter[2] = data;
@@ -332,8 +339,8 @@ public:
                         uiMainEventPhase = DONE;
                         if (GameObject* pMainDoor = instance->GetGameObject(uiMainDoor))
                             pMainDoor->SetGoState(GO_STATE_ACTIVE);
-                        if (!bCrystalActivated && uiDoorIntegrity == 100)
-                            DoCompleteAchievement(ACHIEV_DEFENSELESS);
+                        //if (!bCrystalActivated && uiDoorIntegrity == 100)
+                        //    DoCompleteAchievement(ACHIEV_DEFENSELESS);
                     }
                     break;
                 case DATA_WAVE_COUNT:

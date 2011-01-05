@@ -155,11 +155,17 @@ public:
             {
                 if (pInstance->GetData(DATA_WAVE_COUNT) == 6)
                 {
+                    if(IsHeroic() && pInstance->GetData(DATA_1ST_BOSS_EVENT) == DONE)
+                        me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+
                     pInstance->SetData(DATA_1ST_BOSS_EVENT, DONE);
                     pInstance->SetData(DATA_WAVE_COUNT, 7);
                 }
                 else if (pInstance->GetData(DATA_WAVE_COUNT) == 12)
                 {
+                    if(IsHeroic() && pInstance->GetData(DATA_2ND_BOSS_EVENT) == DONE)
+                        me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+
                     pInstance->SetData(DATA_2ND_BOSS_EVENT, DONE);
                     pInstance->SetData(DATA_WAVE_COUNT, 13);
                 }
@@ -177,7 +183,7 @@ public:
         void JustSummoned(Creature* summon)
         {
             summon->AI()->AttackStart(me->getVictim());
-            summon->AI()->DoCastAOE(SPELL_ZURAMAT_ADD_2);
+            summon->AI()->DoCastAOE(DUNGEON_MODE(SPELL_ZURAMAT_ADD_2,H_SPELL_ZURAMAT_ADD_2),true);
             summon->SetPhaseMask(17,true);
         }
     };
