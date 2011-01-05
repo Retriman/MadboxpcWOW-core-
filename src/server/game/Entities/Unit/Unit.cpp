@@ -16349,12 +16349,30 @@ bool Unit::CheckPlayerCondition(Player* pPlayer)
 {
     switch(GetEntry())
     {
-            case 35644: //Argent Warhorse
-            case 36558: //Argent Battleworg
-                if (!pPlayer->HasItemOrGemWithIdEquipped(46106,1)) //Check item Argent Lance
-                    return false;
-            default:
-                return true;
+            case 35644: // Argent Warhorse
+            case 36558: // Argent Battleworg
+            case 33870: // Stabled argent Warhorse
+            case 33843: // Stabled Quel'dorei Steed
+            case 33794: // Stabled Darnassian Nightsaber
+            case 33800: // Stabled Stormwind Steed
+            case 33793: // Stabled Gnomeregan Mechanostrider
+            case 33795: // Stabled Ironfoge Ram
+            case 33790: // Stabled Azuremyst Elekk
+            case 33842: // Stabled Sunreaver Hawkstrider
+            case 33796: // Stabled Darkspear Raptor
+            case 33798: // Stabled Forsaken Warhorse
+            case 33799: // Stabled Orgrimmar Wolf
+            case 33791: // Stabled Silvermoon Hawksrider
+            case 33792: // Stabled Thunder Bluff Kodo
+                if (pPlayer->HasItemOrGemWithIdEquipped(46070,1)) // Check item Horde Lance
+                    return true;
+                                if (pPlayer->HasItemOrGemWithIdEquipped(46106,1)) // Check item argent Lance
+                    return true;
+                                if (pPlayer->HasItemOrGemWithIdEquipped(46069,1)) // Check item Alliance Lance
+                    return true;
+                                return false;
+                default:
+                    return true;
     }
 }
 
