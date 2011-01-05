@@ -1044,6 +1044,52 @@ public:
     }
 };
 
+/*######
+## Quest: Forging a Head (12985)
+######*/
+
+enum eDeadIrongiant
+{
+    ENTRY_AMBUSHER              = 30208,
+    SPELL_SALVAGE_CORPSE        = 56227,
+    SPELL_CREATE_EYES           = 56230
+};
+
+class npc_dead_irongiant : public CreatureScript
+{
+public:
+    npc_dead_irongiant() : CreatureScript("npc_dead_irongiant") {}
+
+    struct npc_dead_irongiantAI : public ScriptedAI
+    {
+        npc_dead_irongiantAI(Creature *pCreature) : ScriptedAI(pCreature) {}
+
+        void SpellHit(Unit *caster, const SpellEntry *spell) 
+        {
+            if (spell->Id == SPELL_SALVAGE_CORPSE)
+            {
+                if (!urand(0,2))
+                {
+                    for (uint8 i = 0; i < 3; ++i)
+                        if (Creature *temp = me->SummonCreature(ENTRY_AMBUSHER, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60*IN_MILLISECONDS))
+                            temp->AI()->AttackStart(caster);
+                }
+                else
+                {
+                    me->CastSpell(caster, SPELL_CREATE_EYES, true);
+                }
+
+                me->ForcedDespawn(500);
+            }
+        }
+    };
+
+    CreatureAI *GetAI(Creature *creature) const
+    {
+        return new npc_dead_irongiantAI(creature);
+    }
+};
+
 void AddSC_storm_peaks()
 {
     new npc_agnetta_tyrsdottar;
@@ -1061,4 +1107,5 @@ void AddSC_storm_peaks()
     new npc_injured_icemaw;
     new npc_harnessed_icemaw;
     new npc_hyldsmeet_protodrake;
+    new npc_dead_irongiant();
 }

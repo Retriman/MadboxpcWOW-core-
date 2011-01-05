@@ -160,7 +160,6 @@ public:
 
 /*######
 ## npc_archmage_vargoth http://www.wowhead.com/item=44738
-
 ######*/
 
 enum eArchmageVargoth
