@@ -22,6 +22,7 @@
 #include "World.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
+#include "Group.h"
 
 //Disable CreatureAI when charmed
 void CreatureAI::OnCharmed(bool /*apply*/)
@@ -104,6 +105,27 @@ void CreatureAI::DoZoneInCombat(Creature* creature)
                 (*itr)->SetInCombatWith(creature);
                 creature->AddThreat(*itr, 0.0f);
             }*/
+        }
+    }
+}
+
+void CreatureAI::DoAttackerGroupInCombat(Player* attacker)
+{
+    if(attacker)
+    {
+        if( Group *pGroup = attacker->GetGroup() )
+        {
+            for(GroupReference *itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+            {
+                Player *pGroupGuy = itr->getSource();
+
+                if(pGroupGuy && pGroupGuy->isAlive() && pGroupGuy->GetMapId() == me->GetMapId())
+                {
+                    me->SetInCombatWith(pGroupGuy);
+                    pGroupGuy->SetInCombatWith(me);
+                    me->AddThreat(pGroupGuy, 0.0f);
+                }
+            }
         }
     }
 }
