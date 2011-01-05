@@ -3671,6 +3671,22 @@ void SpellMgr::LoadSpellCustomAttr()
             spellInfo->EffectImplicitTargetA[1] = TARGET_DST_CASTER;
             count++;
             break;
+        case 57581: //Shadow Fissure - Sartharion Drakes
+        case 59128: //Shadow Fissure - Sartharion Drakes
+        case 57570: //Shadow Breath - Sartharion Drakes
+        case 59126: //Shadow Breath - Sartharion Drakes
+        case 56908: //Fire Breath - Sartharion
+        case 58956: //Fire Breath - Sartharion
+        case 57874: //Twilight Shift Damage - Sartharion
+            spellInfo->AttributesEx4 |= SPELL_ATTR4_FIXED_DAMAGE;
+            count++;
+            break;
+        case 57697: //Lavastrike Hack - Sartharion
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DST_TARGET_ENEMY;
+            //spellInfo->EffectImplicitTargetB[0] = TARGET_DEST_TARGET_RANDOM;
+            spellInfo->EffectImplicitTargetB[0] = TARGET_DST_TARGET_ENEMY; //This would be more funny
+            count++;
+            break;
         case 41376: // Spite
         case 39992: // Needle Spine
         case 29576: // Multi-Shot
