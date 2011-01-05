@@ -2331,6 +2331,24 @@ GameObject* WorldObject::FindNearestGameObject(uint32 entry, float range)
     return go;
 }
 
+Player* WorldObject::FindNearestPlayer(float range, bool alive)
+{
+    Player* player = NULL;
+    Trinity::AnyPlayerInObjectRangeCheck checker(this, range, alive);
+    Trinity::PlayerSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, player, checker);
+    VisitNearbyWorldObject(range, searcher);
+    return player;
+}
+
+std::list<Player*> WorldObject::GetNearestPlayersList(float range, bool alive) 
+{
+    std::list<Player*> players;
+    Trinity::AnyPlayerInObjectRangeCheck checker(this, range, alive);
+    Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, players, checker);
+    VisitNearbyWorldObject(range, searcher);
+    return players;
+}
+
 void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange)
 {
     CellPair pair(Trinity::ComputeCellPair(this->GetPositionX(), this->GetPositionY()));
@@ -2664,7 +2682,7 @@ void WorldObject::DestroyForNearbyPlayers()
         return;
 
     std::list<Player*> targets;
-    Trinity::AnyPlayerInObjectRangeCheck check(this, GetVisibilityRange());
+    Trinity::AnyPlayerInObjectRangeCheck check(this, GetVisibilityRange(),true);
     Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
     VisitNearbyWorldObject(GetVisibilityRange(), searcher);
     for (std::list<Player*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)

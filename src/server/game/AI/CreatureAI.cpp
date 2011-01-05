@@ -119,6 +119,35 @@ void CreatureAI::MoveInLineOfSight_Safe(Unit *who)
     m_MoveInLineOfSight_locked = false;
 }
 
+void CreatureAI::DoAttackerAreaInCombat(Unit* attacker, float range, Unit* pUnit)
+{
+        if (!attacker)
+            attacker = me;
+
+        if (!pUnit)
+            pUnit = me;
+
+        Map *map = pUnit->GetMap();
+
+        if (!map->IsDungeon())
+            return;
+
+        if (!pUnit->CanHaveThreatList() || pUnit->getThreatManager().isThreatListEmpty())
+            return;
+
+        Map::PlayerList const &PlayerList = map->GetPlayers();
+        for(Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+        {
+           if (Player* i_pl = i->getSource())
+                if (i_pl->isAlive() && attacker->GetDistance(i_pl) <= range )
+                {
+                    pUnit->SetInCombatWith(i_pl);
+                    i_pl->SetInCombatWith(pUnit);
+                    pUnit->AddThreat(i_pl, 0.0f);
+                }
+        }
+}
+
 void CreatureAI::MoveInLineOfSight(Unit *who)
 {
     if (me->getVictim())

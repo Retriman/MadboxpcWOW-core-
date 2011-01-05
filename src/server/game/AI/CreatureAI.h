@@ -97,6 +97,8 @@ class CreatureAI : public UnitAI
         // Called for reaction at enter to combat if not in combat yet (enemy can be NULL)
         virtual void EnterCombat(Unit* /*enemy*/) {}
 
+        // called for damagetaken
+        virtual void ElementalDamageTaken(Unit *done_by, uint32 damage, SpellSchoolMask damageSchoolMask) {}
         // Called when the creature is killed
         virtual void JustDied(Unit *) {}
 
@@ -136,6 +138,7 @@ class CreatureAI : public UnitAI
         // Called at reaching home after evade
         virtual void JustReachedHome() {}
 
+        void DoAttackerAreaInCombat(Unit* attacker, float range, Unit* pUnit = NULL);
         void DoZoneInCombat(Creature* pUnit = NULL);
 
         // Called at text emote receive from player

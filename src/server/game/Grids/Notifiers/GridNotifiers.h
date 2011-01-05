@@ -1126,17 +1126,18 @@ namespace Trinity
     class AnyPlayerInObjectRangeCheck
     {
     public:
-        AnyPlayerInObjectRangeCheck(WorldObject const* obj, float range) : i_obj(obj), i_range(range) {}
+        AnyPlayerInObjectRangeCheck(WorldObject const* obj, float range, bool alive) : i_obj(obj), i_range(range), i_alive(alive) {}
         bool operator()(Player* u)
         {
-            if (u->isAlive() && i_obj->IsWithinDistInMap(u, i_range))
+            if (u->isAlive() == i_alive && i_obj->IsWithinDistInMap(u, i_range))
                 return true;
 
             return false;
         }
     private:
         WorldObject const* i_obj;
-        float i_range;
+        bool    i_alive;
+        float   i_range;
     };
 
     class AllFriendlyCreaturesInGrid
