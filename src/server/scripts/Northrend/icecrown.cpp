@@ -787,7 +787,7 @@ public:
             else
             {
                 if (DespawnTimer <= diff)
-                    me->ForcedDespawn();
+                    me->DespawnOrUnsummon();
                 else
                     DespawnTimer -= diff;
             }
@@ -2255,7 +2255,7 @@ public:
                 if (spell->Id == SPELL_INCAPACITATE_MALORIC && CAST_PLR(pCaster)->GetQuestStatus(QUEST_THERES_SOMETHING_ABOUT_THE_SQUIRE) == QUEST_STATUS_INCOMPLETE)
                 {
                     DoCast(pCaster, SPELL_SEARCH_MALORIC_CREDIT, true);
-                    me->ForcedDespawn();
+                    me->DespawnOrUnsummon();
                 }        
             }           
         }
@@ -2297,7 +2297,7 @@ public:
             if (pCaster->GetTypeId() == TYPEID_PLAYER)
             {
                 if (spell->Id == SPELL_DARKMENDERS_TINCTURE && CAST_PLR(pCaster)->GetQuestStatus(QUEST_FROM_THEIR_CORPORSES_RISE) == QUEST_STATUS_INCOMPLETE)
-                    me->ForcedDespawn();
+                    me->DespawnOrUnsummon();
             }           
         }
 	};
