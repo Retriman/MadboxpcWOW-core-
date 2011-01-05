@@ -766,6 +766,25 @@ void WorldSession::SendListInventory(uint64 vendorguid)
                 // player is on. If GM on, display all items.
                 if (!_player->isGameMaster() && ((pProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY && _player->GetTeam() == ALLIANCE) || (pProto->Flags2 == ITEM_FLAGS_EXTRA_ALLIANCE_ONLY && _player->GetTeam() == HORDE)))
                     continue;
+                // Items BOA (Bind Acounts) Shoulder - Head enchants solo si el player tiene la reputacion
+                if (!_player->isGameMaster() && pProto->Flags2 & ITEM_FLAGS_EXTRA_SELL_AT_REPUTATION)
+                {
+                    ReputationRank rank;
+                    switch (pProto->ItemId)
+                    {
+                        case 44133: // Sons Of Hodir Enchantments
+                        case 44134:
+                        case 44135:
+                        case 44136:
+                            rank = REP_EXALTED;
+                            break;
+                        default:
+                            rank = REP_REVERED;
+                    }
+                    if (FactionTemplateEntry const* vendor_faction = pCreature->getFactionTemplateEntry())
+                        if (_player->GetReputationRank(vendor_faction->faction) < rank)
+                            continue;
+                }
                 ++count;
 
                 // reputation discount
