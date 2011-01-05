@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -20,12 +20,14 @@
 
 enum Data
 {
+    DATA_CRATES_EVENT,
     DATA_MEATHOOK_EVENT,
     DATA_SALRAMM_EVENT,
     DATA_EPOCH_EVENT,
     DATA_MAL_GANIS_EVENT,
     DATA_INFINITE_EVENT,
-    DATA_ARTHAS_EVENT
+    DATA_ARTHAS_EVENT,
+    DATA_COUNTDOWN
 };
 
 enum Data64
@@ -63,5 +65,20 @@ enum GameObjects
     GO_EXIT_GATE                                           = 191788,
     GO_MALGANIS_CHEST_N                                    = 190663,
     GO_MALGANIS_CHEST_H                                    = 193597
+};
+
+enum KillCredit
+{
+    CREDIT_A_ROYAL_ESCORT                       = 31006,
+    CREDIT_DISPELLING_ILLUSIONS                 = 30996
+};
+
+enum WorldStatesCoS
+{
+    WORLDSTATE_NUMBER_CRATES_SHOW               = 3479,
+    WORLDSTATE_NUMBER_CRATES_COUNT              = 3480,
+    WORLDSTATE_NUMBER_SCOURGE_WAVES_SHOW_COUNT  = 3504,
+    WORLDSTATE_NUMBER_INFINITE_TIMER            = 3931,
+    WORLDSTATE_NUMBER_INFINITE_SHOW             = 3932
 };
 #endif
