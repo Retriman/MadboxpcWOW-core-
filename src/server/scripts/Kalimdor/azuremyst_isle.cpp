@@ -203,7 +203,7 @@ public:
         {
             pPlayer->CLOSE_GOSSIP_MENU();
             pCreature->setFaction(FACTION_HOSTILE);
-            CAST_AI(npc_engineer_spark_overgrind::npc_engineer_spark_overgrindAI, pCreature->AI())->AttackStart(pPlayer);
+            pCreature->AI()->AttackStart(pPlayer);
         }
         return true;
     }
