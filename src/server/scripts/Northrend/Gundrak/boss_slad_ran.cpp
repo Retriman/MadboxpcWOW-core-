@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -29,16 +29,16 @@ enum Spells
     H_SPELL_VENOM_BOLT                            = 59839
 };
 
-//Yell
+// Yells - Emotes
 enum Yells
 {
-    SAY_AGGRO                                     = -1604000,
-    SAY_SUMMON_SNAKES                             = -1604001,
-    SAY_SUMMON_CONSTRICTORS                       = -1604002,
-    SAY_SLAY_1                                    = -1604003,
-    SAY_SLAY_2                                    = -1604004,
-    SAY_SLAY_3                                    = -1604005,
-    SAY_DEATH                                     = -1604006,
+    SAY_AGGRO                                     = -1604017,
+    SAY_SLAY_1                                    = -1604018,
+    SAY_SLAY_2                                    = -1604019,
+    SAY_SLAY_3                                    = -1604020,
+    SAY_DEATH                                     = -1604021,
+    SAY_SUMMON_SNAKES                             = -1604022,
+    SAY_SUMMON_CONSTRICTORS                       = -1604023,
     EMOTE_NOVA                                    = -1604007
 };
 

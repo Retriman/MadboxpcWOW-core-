@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -41,15 +41,15 @@ enum eAchievements
 
 enum eSays
 {
-    SAY_AGGRO                                     = -1604011,
-    SAY_QUAKE                                     = -1604012,
-    SAY_TRANSFORM                                 = -1604013,
-    SAY_SLAY_1                                    = -1604014,
-    SAY_SLAY_2                                    = -1604015,
-    SAY_SLAY_3                                    = -1604016,
-    SAY_DEATH                                     = -1604017,
-    EMOTE_TRANSFORM                               = -1604018,
-    EMOTE_TRANSFORMED                             = -1604029,
+    SAY_AGGRO                                     = -1604010,
+    SAY_SLAY_1                                    = -1604011, 
+    SAY_SLAY_2                                    = -1604012,
+    SAY_SLAY_3                                    = -1604013,
+    SAY_DEATH                                     = -1604014,
+    SAY_TRANSFORM                                 = -1604015,
+    SAY_QUAKE                                     = -1604016,
+    EMOTE_TRANSFORM                               = -1604017,
+    EMOTE_TRANSFORMED                             = -1604029
 };
 
 class boss_moorabi : public CreatureScript

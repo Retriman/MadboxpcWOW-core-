@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -42,18 +42,18 @@ enum Spells
 //Yells
 enum Yells
 {
-    SAY_AGGRO                                     = -1604019,
-    SAY_TRANSFORM_1                               = -1604020,
-    SAY_TRANSFORM_2                               = -1604021,
-    SAY_SUMMON_1                                  = -1604022,
-    SAY_SUMMON_2                                  = -1604023,
-    SAY_SUMMON_3                                  = -1604024,
-    SAY_SLAY_1                                    = -1604025,
-    SAY_SLAY_2                                    = -1604026,
-    SAY_SLAY_3                                    = -1604027,
-    SAY_DEATH                                     = -1604028
-
+    SAY_AGGRO                                       = -1604000,
+    SAY_SLAY_1                                      = -1604001,
+    SAY_SLAY_2                                      = -1604002,
+    SAY_SLAY_3                                      = -1604003,
+    SAY_DEATH                                       = -1604004,
+    SAY_SUMMON_1                                    = -1604005,
+    SAY_SUMMON_2                                    = -1604006,
+    SAY_SUMMON_3                                    = -1604007,
+    SAY_TRANSFORM_1                                 = -1604008,  //Phase change
+    SAY_TRANSFORM_2                                 = -1604009
 };
+
 
 enum Achievements
 {
