@@ -1185,6 +1185,7 @@ UPDATE `creature_template` SET `ScriptName`='npc_avatar_of_freya' WHERE `entry`=
 UPDATE `creature_template` SET `ScriptName`='npc_bushwhacker' WHERE `entry`=28317;
 UPDATE `creature_template` SET `ScriptName`='npc_engineer_helice' WHERE `entry`=28787;
 UPDATE `creature_template` SET `ScriptName`='npc_adventurous_dwarf' WHERE `entry`=28604;
+UPDATE `creature_template` SET `ScriptName`='npc_jungle_punch_target' WHERE `entry` IN(27986,28047,28568);
 
 /* SILITHUS */
 UPDATE `creature_template` SET `ScriptName`='npcs_rutgar_and_frankal' WHERE `entry` IN (15170,15171);
@@ -1217,7 +1218,8 @@ UPDATE `creature_template` SET `ScriptName`='npc_thorim' WHERE `entry`=29445;
 UPDATE `creature_template` SET `ScriptName`='npc_goblin_prisoner' WHERE `entry`=29466;
 UPDATE `gameobject_template` SET ScriptName='go_rusty_cage' WHERE `entry`=191544;
 UPDATE `creature_template` SET `ScriptName`='npc_injured_goblin' WHERE `entry`=29434;
-UPDATE `creature_template` SET `ScriptName`= 'npc_roxi_ramrocket' WHERE `entry` = 31247;
+UPDATE `creature_template` SET `ScriptName`='npc_roxi_ramrocket' WHERE `entry`=31247;
+UPDATE `creature_template` SET `ScriptName`='npc_brunnhildar_prisoner' WHERE `entry`=29639;
 
 /* STORMWIND CITY */
 UPDATE `creature_template` SET `ScriptName`='npc_archmage_malin' WHERE `entry`=2708;
