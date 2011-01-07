@@ -14,6 +14,6 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 (@NPC, 0, 48507, 0, 0, 1758),-- http://www.wowhead.com/item=48507 - Relentless Gladiator's Handaxe
 (@NPC, 0, 48517, 0, 0, 1758),-- http://www.wowhead.com/item=48517 - Relentless Gladiator's Halberd
 (@NPC, 0, 48523, 0, 0, 1758),-- http://www.wowhead.com/item=48523 - Relentless Gladiator's Greatstaf
-(@NPC, 0, 48515, 0, 0, 1758), -- http://www.wowhead.com/item=48515 - Relentless Gladiator's Grasp
-(@NPC, 0, 48442, 0, 0, 1758), -- http://www.wowhead.com/item=48442 - Relentless Gladiator's Eviscerator
+(@NPC, 0, 48515, 0, 0, 1758),-- http://www.wowhead.com/item=48515 - Relentless Gladiator's Grasp
+(@NPC, 0, 48442, 0, 0, 1758),-- http://www.wowhead.com/item=48442 - Relentless Gladiator's Eviscerator
 (@NPC, 0, 49191, 0, 0, 1758);-- http://www.wowhead.com/item=49191 - Relentless Gladiator's Blade of Celerity
