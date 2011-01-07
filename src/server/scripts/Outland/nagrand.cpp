@@ -906,8 +906,77 @@ public:
 
 
 /*####
-#
+# Quest Soporte http://www.wowhead.com/quest=9923 "HELP!"
 ####*/
+
+enum eHelp
+{
+    QUEST_HELP                      = 9923,
+    NPC_CORKI                       = 18445,
+    SAY_CREDIT                      = -1850070
+};
+
+class go_help_cage : public GameObjectScript
+{
+public:
+    go_help_cage() : GameObjectScript("go_help_cage") { }
+
+    bool OnGossipHello(Player *pPlayer, GameObject *pGO)
+    {
+        if (pPlayer->GetQuestStatus(QUEST_HELP) == QUEST_STATUS_INCOMPLETE)
+        {
+            Creature *pCorki = pGO->FindNearestCreature(NPC_CORKI,1.0f);
+            if (pCorki)
+            {
+                DoScriptText(SAY_CREDIT, pCorki);
+                Quest const* qInfo = sObjectMgr->GetQuestTemplate(QUEST_HELP);
+                if (qInfo)
+                {
+                    pPlayer->KilledMonsterCredit(qInfo->ReqCreatureOrGOId[0],0);
+                }
+            }
+        }
+        return true;
+    }
+};
+
+
+/*####
+# Quest Soporte http://www.wowhead.com/quest=9924 "Corki's Gone Missing Again!"
+####*/
+
+enum eCorki
+{
+    QUEST_CORKI_GONE_MISSING_AGAIN  = 9924,
+    NPC_CORKI_RUN                   = 20812,//Guid: 79588
+    SAY_RUN                         = -1850071//This is the last time I get caughht! I promise! Bye!
+};
+
+class go_corki_cage : public GameObjectScript
+{
+public:
+    go_corki_cage() : GameObjectScript("go_corki_cage") { }
+
+    bool OnGossipHello(Player *pPlayer, GameObject *pGO)
+    {
+        if (pPlayer->GetQuestStatus(QUEST_CORKI_GONE_MISSING_AGAIN) == QUEST_STATUS_INCOMPLETE)
+        {
+            Creature *pCorkiRun = pGO->FindNearestCreature(NPC_CORKI_RUN,1.0f);
+            if (pCorkiRun)
+            {
+                pCorkiRun->GetMotionMaster()->MoveFleeing(pPlayer, 3500);
+                DoScriptText(SAY_RUN, pCorkiRun);
+                pCorkiRun->DespawnOrUnsummon();
+                Quest const* qInfo = sObjectMgr->GetQuestTemplate(QUEST_CORKI_GONE_MISSING_AGAIN);
+                if (qInfo)
+                {
+                    pPlayer->KilledMonsterCredit(qInfo->ReqCreatureOrGOId[0],0);
+                }
+            }
+        }
+        return true;
+    }
+};
 
 void AddSC_nagrand()
 {
@@ -920,4 +989,6 @@ void AddSC_nagrand()
     new npc_maghar_captive();
     new npc_creditmarker_visit_with_ancestors();
     new mob_sparrowhawk();
+    new go_help_cage();
+    new go_corki_cage();
 }
