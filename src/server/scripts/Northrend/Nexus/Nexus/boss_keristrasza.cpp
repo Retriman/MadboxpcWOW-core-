@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -70,25 +70,23 @@ public:
         InstanceScript* pInstance;
 
         uint32 uiCrystalfireBreathTimer;
-        uint32 uiCrystalChainsCrystalizeTimer;
+        uint32 uiCrystalChainsTimer;
+        uint32 uiCrystalizeTimer;
         uint32 uiTailSweepTimer;
         bool bEnrage;
 
+        std::set<uint64> lIntenseColdPlayers;
         uint64 auiContainmentSphereGUIDs[DATA_CONTAINMENT_SPHERES];
-
-        uint32 uiCheckIntenseColdTimer;
-        bool bMoreThanTwoIntenseCold; // needed for achievement: Intense Cold(2036)
 
         void Reset()
         {
-            uiCrystalfireBreathTimer = 14*IN_MILLISECONDS;
-            uiCrystalChainsCrystalizeTimer = DUNGEON_MODE(30*IN_MILLISECONDS,11*IN_MILLISECONDS);
+            uiCrystalfireBreathTimer = 10*IN_MILLISECONDS;
+            uiCrystalChainsTimer = 20*IN_MILLISECONDS;
+            uiCrystalizeTimer = urand(10*IN_MILLISECONDS, 15*IN_MILLISECONDS);
             uiTailSweepTimer = 5*IN_MILLISECONDS;
             bEnrage = false;
 
-            uiCheckIntenseColdTimer = 2*IN_MILLISECONDS;
-            bMoreThanTwoIntenseCold = false;
-
+            lIntenseColdPlayers.clear();
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 
             RemovePrison(CheckContainmentSpheres());
@@ -100,10 +98,16 @@ public:
         void EnterCombat(Unit* /*who*/)
         {
             DoScriptText(SAY_AGGRO, me);
-            DoCastAOE(SPELL_INTENSE_COLD);
+            DoCast(SPELL_INTENSE_COLD);
 
             if (pInstance)
+            {
                 pInstance->SetData(DATA_KERISTRASZA_EVENT, IN_PROGRESS);
+
+                Map::PlayerList const &players = pInstance->instance->GetPlayers();
+                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                    lIntenseColdPlayers.insert(itr->getSource()->GetGUID());
+            }
         }
 
         void JustDied(Unit* /*killer*/)
@@ -112,8 +116,17 @@ public:
 
             if (pInstance)
             {
-                if (IsHeroic() && !bMoreThanTwoIntenseCold)
-                    pInstance->DoCompleteAchievement(ACHIEV_INTENSE_COLD);
+                AchievementEntry const *achievIntenseCold = GetAchievementStore()->LookupEntry(ACHIEV_INTENSE_COLD);
+                if (achievIntenseCold && IsHeroic())
+                {
+                    for (std::set<uint64>::const_iterator itr = lIntenseColdPlayers.begin(); itr != lIntenseColdPlayers.end(); ++itr)
+                    {
+                        Player* temp = Unit::GetPlayer(*me, *itr);
+                        if (temp && temp->isAlive() && (temp->GetDistance2d(me) < 50))
+                            temp->CompletedAchievement(achievIntenseCold);
+                    }
+                }
+
                 pInstance->SetData(DATA_KERISTRASZA_EVENT, DONE);
             }
         }
@@ -164,29 +177,21 @@ public:
             }
         }
 
+        void SpellHitTarget(Unit *pTarget, const SpellEntry *spell) 
+        {
+            if (pTarget->GetTypeId() != TYPEID_PLAYER)
+                return;
+            
+            if (spell->Id == SPELL_INTENSE_COLD_TRIGGERED)
+                 if (Aura* pColdAura = pTarget->GetAura(SPELL_INTENSE_COLD_TRIGGERED))
+                     if (pColdAura->GetStackAmount() > 2)
+                         lIntenseColdPlayers.erase(pTarget->GetGUID());
+        }
+
         void UpdateAI(const uint32 diff)
         {
             if (!UpdateVictim())
                 return;
-
-            if (uiCheckIntenseColdTimer < diff && !bMoreThanTwoIntenseCold)
-            {
-                std::list<HostileReference*> ThreatList = me->getThreatManager().getThreatList();
-                for (std::list<HostileReference*>::const_iterator itr = ThreatList.begin(); itr != ThreatList.end(); ++itr)
-                {
-                    Unit *pTarget = Unit::GetUnit(*me, (*itr)->getUnitGuid());
-                    if (!pTarget || pTarget->GetTypeId() != TYPEID_PLAYER)
-                        continue;
-
-                    Aura *AuraIntenseCold = pTarget->GetAura(SPELL_INTENSE_COLD_TRIGGERED);
-                    if (AuraIntenseCold && AuraIntenseCold->GetStackAmount() > 2)
-                    {
-                        bMoreThanTwoIntenseCold = true;
-                        break;
-                    }
-                }
-                uiCheckIntenseColdTimer = 2*IN_MILLISECONDS;
-            } else uiCheckIntenseColdTimer -= diff;
 
             if (!bEnrage && HealthBelowPct(25))
             {
@@ -197,7 +202,7 @@ public:
 
             if (uiCrystalfireBreathTimer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_CRYSTALFIRE_BREATH);
+            DoCast(me->getVictim(), DUNGEON_MODE(SPELL_CRYSTALFIRE_BREATH, H_SPELL_CRYSTALFIRE_BREATH));
                 uiCrystalfireBreathTimer = 14*IN_MILLISECONDS;
             } else uiCrystalfireBreathTimer -= diff;
 
@@ -207,15 +212,22 @@ public:
                 uiTailSweepTimer = 5*IN_MILLISECONDS;
             } else uiTailSweepTimer -= diff;
 
-            if (uiCrystalChainsCrystalizeTimer <= diff)
+            if (uiCrystalChainsTimer <= diff)
             {
-                DoScriptText(SAY_CRYSTAL_NOVA, me);
-                if (IsHeroic())
-                    DoCast(me, SPELL_CRYSTALIZE);
-                else if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                     DoCast(pTarget, SPELL_CRYSTAL_CHAINS);
-                uiCrystalChainsCrystalizeTimer = DUNGEON_MODE(30*IN_MILLISECONDS,11*IN_MILLISECONDS);
-            } else uiCrystalChainsCrystalizeTimer -= diff;
+                uiCrystalChainsTimer = urand(15*IN_MILLISECONDS, 20*IN_MILLISECONDS);
+            } else uiCrystalChainsTimer -= diff;
+
+            if (IsHeroic()) {
+                if (uiCrystalizeTimer <= diff)
+                {
+                    DoScriptText(SAY_CRYSTAL_NOVA, me);
+                    DoCast(me, SPELL_CRYSTALIZE);
+
+                    uiCrystalizeTimer = urand(20*IN_MILLISECONDS, 25*IN_MILLISECONDS);
+                } else uiCrystalizeTimer -= diff;
+            }
 
             DoMeleeAttackIfReady();
         }

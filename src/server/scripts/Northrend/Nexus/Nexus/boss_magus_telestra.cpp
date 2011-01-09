@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -30,7 +30,10 @@ enum Spells
 
     SPELL_FIRE_MAGUS_VISUAL                       = 47705,
     SPELL_FROST_MAGUS_VISUAL                      = 47706,
-    SPELL_ARCANE_MAGUS_VISUAL                     = 47704
+    SPELL_ARCANE_MAGUS_VISUAL                     = 47704,
+
+    SPELL_CRITTER                                 = 47731,
+    SPELL_TIMESTOP                                = 47736
 };
 enum Creatures
 {
@@ -70,6 +73,22 @@ public:
         boss_magus_telestraAI(Creature* c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
+
+            //temporary, needs different target selection
+            SpellEntry *TempSpell;
+            TempSpell = GET_SPELL(SPELL_CRITTER);
+            if (TempSpell)
+            { 
+                TempSpell->EffectImplicitTargetA[0] = 6;
+                TempSpell->EffectImplicitTargetA[1] = 6;
+                TempSpell->EffectImplicitTargetA[2] = 6;
+                TempSpell->EffectImplicitTargetB[0] = 0;
+                TempSpell->EffectImplicitTargetB[1] = 0;
+                TempSpell->EffectImplicitTargetB[2] = 0;
+                TempSpell->EffectRadiusIndex[0] = 0;
+                TempSpell->EffectRadiusIndex[1] = 0;
+                TempSpell->EffectRadiusIndex[2] = 0;
+            }
         }
 
         InstanceScript* pInstance;
@@ -226,10 +245,7 @@ public:
                     me->GetMap()->CreatureRelocation(me, CenterOfRoom.GetPositionX(), CenterOfRoom.GetPositionY(), CenterOfRoom.GetPositionZ(), CenterOfRoom.GetOrientation());
                     DoCast(me, SPELL_TELESTRA_BACK);
                     me->SetVisible(true);
-                    if (Phase == 1)
-                        Phase = 2;
-                    if (Phase == 3)
-                        Phase = 4;
+                    Phase++;
                     uiFireMagusGUID = 0;
                     uiFrostMagusGUID = 0;
                     uiArcaneMagusGUID = 0;
@@ -260,7 +276,7 @@ public:
                 return;
             }
 
-            if (IsHeroic() && (Phase == 2) && HealthBelowPct(10))
+        if (IsHeroic() && (Phase == 2) && HealthBelowPct(15))
             {
                 Phase = 3;
                 me->CastStop();
@@ -321,11 +337,64 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
+class boss_magus_telestra_arcane : public CreatureScript
+{
+public:
+    boss_magus_telestra_arcane() : CreatureScript("boss_magus_telestra_arcane") { }
+
+    struct boss_magus_telestra_arcaneAI : public ScriptedAI
+    {
+        boss_magus_telestra_arcaneAI(Creature* c) : ScriptedAI(c)
+        {
+            pInstance = c->GetInstanceScript();
+        }
+
+        InstanceScript* pInstance;
+
+        uint32 uiCritterTimer;
+        uint32 uiTimeStopTimer;
+
+        void Reset()
+        {
+            uiCritterTimer = urand(2000, 5000);
+            uiTimeStopTimer = urand(7000, 10000);
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            if (uiCritterTimer<=diff)
+            {
+                if (Unit *pTarget = SelectUnit(SELECT_TARGET_RANDOM, 0))
+                {
+                    DoCast(pTarget, SPELL_CRITTER, false);
+                    uiCritterTimer = urand(5000, 8000);
+                }
+            }else uiCritterTimer-=diff;
+
+            if (uiTimeStopTimer<=diff)
+            {
+                DoCastAOE(SPELL_TIMESTOP);
+                uiTimeStopTimer = urand(15000, 18000);
+            } else uiTimeStopTimer-=diff;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new boss_magus_telestra_arcaneAI(pCreature);
+    }
+
+};
 
 void AddSC_boss_magus_telestra()
 {
     new boss_magus_telestra();
+    new boss_magus_telestra_arcane();
 }
