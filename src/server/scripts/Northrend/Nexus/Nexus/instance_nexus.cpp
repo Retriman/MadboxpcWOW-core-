@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -49,7 +49,6 @@ public:
         uint64 OrmoroksContainmentSphere;
         uint64 TelestrasContainmentSphere;
 
-        std::set<uint64> FrayerGUIDlist;
         std::string strInstData;
 
         void Initialize()
@@ -58,8 +57,6 @@ public:
 
             Anomalus = 0;
             Keristrasza = 0;
-
-            FrayerGUIDlist.clear();
         }
 
         void OnCreatureCreate(Creature* creature)
@@ -79,19 +76,6 @@ public:
                     break;
                 case 26723:
                     Keristrasza = creature->GetGUID();
-                    break;
-                // Crystalline Frayer
-                case 26793:
-                    if (GetData(DATA_ORMOROK_EVENT) == DONE)
-                    {
-                        creature->UpdateEntry(29911);
-                        creature->setFaction(35); 
-                    }
-                    else
-                    {
-                        if (creature->isAlive())
-                            FrayerGUIDlist.insert(creature->GetGUID());
-                    }
                     break;
                 // Alliance npcs are spawned by default, if you are alliance, you will fight against horde npcs.
                 case 26800:
@@ -165,22 +149,6 @@ public:
             }
         }
 
-        void ConvertFrayer()
-        {
-            if (!FrayerGUIDlist.empty())   
-                for (std::set<uint64>::const_iterator itr = FrayerGUIDlist.begin(); itr != FrayerGUIDlist.end(); ++itr)
-                {
-                    Creature* pFrayer = instance->GetCreature(*itr);
-                    if (pFrayer && pFrayer->isAlive())
-                    {
-                        pFrayer->UpdateEntry(29911);
-                        pFrayer->RemoveAllAuras();
-                        pFrayer->setFaction(35);
-                        pFrayer->AI()->EnterEvadeMode();
-                    }
-                }
-        }
-
         uint32 GetData(uint32 identifier)
         {
             switch(identifier)
@@ -224,8 +192,6 @@ public:
                     {
                         if (GameObject* Sphere = instance->GetGameObject(OrmoroksContainmentSphere))
                             Sphere->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_UNK1);
-
-                        ConvertFrayer();
                     }
                     m_auiEncounter[2] = data;
                     break;

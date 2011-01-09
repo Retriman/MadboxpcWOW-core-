@@ -122,7 +122,7 @@ public:
             }
 
             if (pInstance)
-                pInstance->SetData(BOSS_ALGALON, IN_PROGRESS);
+                pInstance->SetData(TYPE_ALGALON, IN_PROGRESS);
         }
 
         void KilledUnit(Unit * /*victim*/)
@@ -136,7 +136,7 @@ public:
 
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             if (pInstance)
-                pInstance->SetData(BOSS_ALGALON, NOT_STARTED);
+                pInstance->SetData(TYPE_ALGALON, NOT_STARTED);
 
             BlackHoleGUID = 0;
 
@@ -217,7 +217,7 @@ public:
                 me->DisappearAndDie();
 
                 if (pInstance)
-                    pInstance->SetData(BOSS_ALGALON, DONE);
+                    pInstance->SetData(TYPE_ALGALON, DONE);
 
                 return;
             }
@@ -368,7 +368,7 @@ public:
 
 };
 
-void AddSC_boss_algalon()
+void AddSC_boss_Algalon()
 {
     new boss_algalon();
     new mob_collapsing_star();

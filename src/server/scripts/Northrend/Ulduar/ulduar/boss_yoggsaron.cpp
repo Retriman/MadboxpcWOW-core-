@@ -52,9 +52,3 @@ enum
 {
     ACHIEV_TIMED_START_EVENT                      = 21001,
 };
-
-
-void AddSC_boss_yoggsaron()
-{
-
-}

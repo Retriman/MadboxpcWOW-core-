@@ -39,6 +39,7 @@ enum Spells
     SPELL_START_THE_ENGINE                      = 62472,
     SPELL_SEARING_FLAME                         = 62402,
     SPELL_BLAZE                                 = 62292,
+    SPELL_TAR_PASSIVE                           = 62288,
     SPELL_SMOKE_TRAIL                           = 63575,
     SPELL_ELECTROSHOCK                          = 62522,
     SPELL_NAPALM                                = 63666,
@@ -210,7 +211,7 @@ public:
 
     struct boss_flame_leviathanAI : public BossAI
     {
-        boss_flame_leviathanAI(Creature* pCreature) : BossAI(pCreature, BOSS_LEVIATHAN), vehicle(pCreature->GetVehicleKit())
+        boss_flame_leviathanAI(Creature* pCreature) : BossAI(pCreature, TYPE_LEVIATHAN), vehicle(pCreature->GetVehicleKit())
         {
             assert(vehicle);
             uiActiveTowers = 4;
@@ -789,7 +790,7 @@ public:
         {
         }
 
-        void JustDied()
+        void JustDied(Unit* /*killer*/)
         {
             float x,y,z;
             me->GetPosition(x,y,z);
@@ -888,6 +889,7 @@ public:
         spell_pool_of_tarAI(Creature* pCreature) : PassiveAI(pCreature)
         {
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->AddAura(SPELL_TAR_PASSIVE, me);
         }
 
         void DamageTaken(Unit * /*who*/, uint32 &damage)
@@ -925,8 +927,8 @@ public:
 
         void JustDied(Unit* /*Who*/)
         {
-            //if (me->GetHomePosition().IsInDist(Center,50.f))
-                //instance->SetData(TYPE_COLOSSUS,instance->GetData(TYPE_COLOSSUS)+1);
+            if (me->GetHomePosition().IsInDist(Center,50.f))
+                instance->SetData(TYPE_COLOSSUS,instance->GetData(TYPE_COLOSSUS)+1);
         }
 
         void UpdateAI(const uint32 /*diff*/)
@@ -1202,7 +1204,7 @@ public:
             if (pPlayer)
                 pPlayer->CLOSE_GOSSIP_MENU();
 
-            if (Creature* pLeviathan = instance->instance->GetCreature(instance->GetData64(BOSS_LEVIATHAN)))
+            if (Creature* pLeviathan = instance->instance->GetCreature(instance->GetData64(TYPE_LEVIATHAN)))
             {
                 CAST_AI(boss_flame_leviathan::boss_flame_leviathanAI, (pLeviathan->AI()))->DoAction(0); //enable hard mode activating the 4 additional events spawning additional vehicles
                 pCreature->SetVisible(false);
@@ -1224,7 +1226,7 @@ public:
     bool OnGossipHello(Player* pPlayer, Creature* pCreature)
     {
         InstanceScript* instance = pCreature->GetInstanceScript();
-        if (instance && instance->GetData(BOSS_LEVIATHAN) !=DONE && pPlayer)
+        if (instance && instance->GetData(TYPE_LEVIATHAN) !=DONE && pPlayer)
         {
             pPlayer->PrepareGossipMenu(pCreature);
 
@@ -1327,16 +1329,16 @@ public:
         switch(pGO->GetEntry())
         {
             case GO_TOWER_OF_STORMS:
-                //instance->ProcessEvent(pGO, EVENT_TOWER_OF_STORM_DESTROYED);
+                instance->ProcessEvent(pGO, EVENT_TOWER_OF_STORM_DESTROYED);
                 break;
             case GO_TOWER_OF_FLAMES:
-                //instance->ProcessEvent(pGO, EVENT_TOWER_OF_FLAMES_DESTROYED);
+                instance->ProcessEvent(pGO, EVENT_TOWER_OF_FLAMES_DESTROYED);
                 break;
             case GO_TOWER_OF_FROST:
-                //instance->ProcessEvent(pGO, EVENT_TOWER_OF_FROST_DESTROYED);
+                instance->ProcessEvent(pGO, EVENT_TOWER_OF_FROST_DESTROYED);
                 break;
             case GO_TOWER_OF_LIFE:
-                //instance->ProcessEvent(pGO, EVENT_TOWER_OF_LIFE_DESTROYED);
+                instance->ProcessEvent(pGO, EVENT_TOWER_OF_LIFE_DESTROYED);
                 break;
         }
 
