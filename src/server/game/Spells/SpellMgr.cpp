@@ -3832,10 +3832,14 @@ void SpellMgr::LoadSpellCustomAttr()
         case 30421:     // Nether Portal - Perseverence
             spellInfo->EffectBasePoints[2] += 30000;
             count++;
-            break;
-        // some dummy spell only has dest, should push caster in this case
+            break;        
         case 62324: // Throw Passenger
-            spellInfo->Targets |= TARGET_FLAG_UNIT_CASTER;
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CASTER;
+            count++;
+            break;
+        case 62907: // Freya's Ward
+        case 62947:
+            spellInfo->DurationIndex = 0;
             count++;
             break;
         case 16834: // Natural shapeshifter
