@@ -936,6 +936,9 @@ void Spell::AddUnitTarget(Unit* pVictim, uint32 effIndex)
 
     // Check for effect immune skip if immuned
     bool immuned = pVictim->IsImmunedToSpellEffect(m_spellInfo, effIndex);
+    // Saronite Vapors Hack
+    if (m_spellInfo->Id == 63337)
+        immuned = false;
 
     uint64 targetGUID = pVictim->GetGUID();
 
@@ -2557,6 +2560,12 @@ void Spell::SelectEffectTargets(uint32 i, uint32 cur)
                                 }
                             }
                             break;
+                            case 62834: // Boom (Boombot)
+                            case 64320: // Rune of Power (Assembly of Iron)
+                            case 28374: // Decimate (Gluth)
+                            case 54426: // Decimate
+                                SearchAreaTarget(unitList, radius, pushType, SPELL_TARGETS_ANY);
+                                break;
 
                         default:
                             sLog->outDebug("Spell (ID: %u) (caster Entry: %u) does not have type CONDITION_SOURCE_TYPE_SPELL_SCRIPT_TARGET record in `conditions` table.", m_spellInfo->Id, m_caster->GetEntry());
@@ -2792,6 +2801,8 @@ void Spell::SelectEffectTargets(uint32 i, uint32 cur)
                         break;
                     case 55789: // Improved Icy Talons
                     case 59725: // Improved Spell Reflection - aoe aura
+                    case 28374: // Decimate
+                    case 54426: // Decimate
                         unitList.remove(m_caster);
                         break;
                     case 72378: // Blood Nova (Deathbringer Saurfang)

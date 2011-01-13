@@ -16,7 +16,6 @@
  */
 
 #include "ScriptPCH.h"
-#include "ScriptedEscortAI.h"
 #include "ulduar.h"
 #include "Vehicle.h"
 

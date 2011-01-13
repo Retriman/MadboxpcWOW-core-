@@ -228,7 +228,7 @@ public:
         void Reset()
         {
             _Reset();
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USESTANDING);
             me->SetVisible(true);
             me->ExitVehicle();
@@ -285,7 +285,7 @@ public:
         void EnterCombat(Unit *who)
         {
             _EnterCombat();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             phase = PHASE_INTRO;
             FlameTimer = 30000;
             if (MimironHardMode)
@@ -570,15 +570,9 @@ public:
                         case 1:
                             if (instance)
                             {
-                                //me->SetVisible(true);
+                                DoScriptText(SAY_AERIAL_DEATH, me);
                                 if (Creature *pLeviathan = me->GetCreature(*me, instance->GetData64(DATA_LEVIATHAN_MK_II)))
-                                   pLeviathan->GetMotionMaster()->MovePoint(0, 2744.65f, 2569.46f, 364.397f);
-                                if (Creature *pVX_001 = me->GetCreature(*me, instance->GetData64(DATA_VX_001)))
-                                {
-                                    me->EnterVehicle(pVX_001->GetVehicleKit(), 1);
-                                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STAND);
-                                    DoScriptText(SAY_AERIAL_DEATH, me);
-                                }
+                                    pLeviathan->GetMotionMaster()->MoveTargetedHome();
                             }
                             JumpToNextStep(5000);
                             break;
@@ -590,6 +584,7 @@ public:
                                         pVX_001->SetStandState(UNIT_STAND_STATE_STAND);
                                         pVX_001->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
                                         pVX_001->EnterVehicle(pLeviathan->GetVehicleKit(), 7);
+                                        DespawnCreatures(NPC_ROCKET, 100);
                                     }
                             JumpToNextStep(2000);
                             break;
@@ -598,9 +593,18 @@ public:
                                 if (Creature *pVX_001 = me->GetCreature(*me, instance->GetData64(DATA_VX_001)))
                                     if (Creature *pAerialUnit = me->GetCreature(*me, instance->GetData64(DATA_AERIAL_UNIT)))
                                     {
+                                        DoScriptText(SAY_V07TRON_ACTIVATE, me);
                                         pAerialUnit->SetFlying(false);
                                         pAerialUnit->EnterVehicle(pVX_001->GetVehicleKit(), 3);
-                                        DoScriptText(SAY_V07TRON_ACTIVATE, me);
+                                        me->EnterVehicle(pVX_001->GetVehicleKit(), 1);
+                                        for (uint8 n = 5; n < 7; n++)
+                                        {
+                                            if (Creature* Rocket = me->SummonCreature(NPC_ROCKET, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_MANUAL_DESPAWN))
+                                            {
+                                                Rocket->SetReactState(REACT_PASSIVE);
+                                                Rocket->EnterVehicle(pVX_001->GetVehicleKit(), n);
+                                            }
+                                        }
                                     }
                             JumpToNextStep(10000);
                             break;
@@ -711,6 +715,10 @@ public:
             me->RemoveAllAuras();
             phase = PHASE_NULL;
             events.SetPhase(PHASE_NULL);
+        }
+        
+        void JustReachedHome()
+        {
             if (Creature *turret = CAST_CRE(me->GetVehicleKit()->GetPassenger(3)))
             {
                 turret->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
@@ -864,7 +872,7 @@ public:
                                 GetCreatureListWithEntryInGrid(m_pCreatures, me, npc, 100);
                                 if (!m_pCreatures.empty())
                                     for(std::list<Creature*>::iterator iter = m_pCreatures.begin(); iter != m_pCreatures.end(); ++iter)
-                                        (*iter)->DespawnOrUnsummon(3000);
+                                        (*iter)->ForcedDespawn(3000);
                             }
                             events.CancelEvent(EVENT_FLAME_SUPPRESSANT);
                             break;
@@ -943,7 +951,7 @@ public:
             if (!Boom && me->IsWithinDistInMap(who, 0.5f) && who->ToPlayer() && !who->ToPlayer()->isGameMaster())
             {
                 DoCastAOE(SPELL_EXPLOSION);
-                me->DespawnOrUnsummon(1000);
+                me->ForcedDespawn(1000);
                 Boom = true;
             }
         }
@@ -955,7 +963,7 @@ public:
                 if (!Boom)
                 {
                     DoCastAOE(SPELL_EXPLOSION);
-                    me->DespawnOrUnsummon(1000);
+                    me->ForcedDespawn(1000);
                     Boom = true;
                 }
             }
@@ -998,7 +1006,6 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
             me->SetReactState(REACT_PASSIVE);
             me->SetStandState(UNIT_STAND_STATE_STAND);
-            //me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STAND);
             me->SetVisible(false);
             me->RemoveAllAuras();
             phase = PHASE_NULL;
@@ -1177,7 +1184,7 @@ public:
         npc_rocket_strikeAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_PACIFIED);
-            me->DespawnOrUnsummon(10000);
+            me->ForcedDespawn(10000);
             DoCast(me, SPELL_ROCKET_STRIKE_AURA);
         }
     };
@@ -1438,9 +1445,10 @@ public:
         {
             DoCast(SPELL_MAGNETIC_CORE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_PACIFIED);
-            me->DespawnOrUnsummon(21000);
+            me->ForcedDespawn(21000);
             if (Creature *pAerialUnit = me->FindNearestCreature(NPC_AERIAL_UNIT, 20, true))
-                pAerialUnit->AI()->DoAction(DO_DISABLE_AERIAL);
+                if (!pAerialUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) && pAerialUnit->IsFlying())
+                    pAerialUnit->AI()->DoAction(DO_DISABLE_AERIAL);
         }
     };
 };
@@ -1673,7 +1681,7 @@ public:
                     GetCreatureListWithEntryInGrid(m_pCreatures, me, npc, 25);
                     if (!m_pCreatures.empty())
                         for(std::list<Creature*>::iterator iter = m_pCreatures.begin(); iter != m_pCreatures.end(); ++iter)
-                            (*iter)->DespawnOrUnsummon(1000);
+                            (*iter)->ForcedDespawn(1000);
                 }
                 uiFrostTimer = 10000;
             }

@@ -319,7 +319,6 @@ public:
                     {
                         EldersCount++;
                         Brightleaf->SetInCombatWithZone();
-                        Brightleaf->CastSpell(Brightleaf, SPELL_BRIGHTLEAFS_ESSENCE, true);
                         Brightleaf->AddAura(SPELL_BRIGHTLEAFS_ESSENCE, Brightleaf);
                         Brightleaf->AddAura(SPELL_DRAINED_OF_POWER, Brightleaf);
                         events.ScheduleEvent(EVENT_BRIGHTLEAF, urand(15000, 30000));
@@ -330,7 +329,6 @@ public:
                     {
                         EldersCount++;
                         Ironbranch->SetInCombatWithZone();
-                        Ironbranch->CastSpell(Ironbranch, SPELL_IRONBRANCHS_ESSENCE, true);
                         Ironbranch->AddAura(SPELL_IRONBRANCHS_ESSENCE, Ironbranch);
                         Ironbranch->AddAura(SPELL_DRAINED_OF_POWER, Ironbranch);
                         events.ScheduleEvent(EVENT_IRONBRANCH, urand(45000, 60000));
@@ -340,9 +338,8 @@ public:
                     if (Stonebark->isAlive())
                     {
                         EldersCount++;
-                        me->AddAura(SPELL_STONEBARKS_ESSENCE, me);
                         Stonebark->SetInCombatWithZone();
-                        Stonebark->CastSpell(Stonebark, SPELL_STONEBARKS_ESSENCE, true);
+                        me->AddAura(SPELL_STONEBARKS_ESSENCE, me);
                         Stonebark->AddAura(SPELL_DRAINED_OF_POWER, Stonebark);
                         events.ScheduleEvent(EVENT_STONEBARK, urand(35000, 45000));
                     }
@@ -387,7 +384,7 @@ public:
                             if (Elemental[2]->isDead())
                             {
                                 for (uint32 i = 0; i < 3; i++)
-                                    Elemental[i]->DespawnOrUnsummon(3000);
+                                    Elemental[i]->ForcedDespawn(3000);
                                 
                                 if (Creature* Freya = me->GetCreature(*me, instance->GetData64(DATA_FREYA)))
                                     Freya->AI()->DoAction(ACTION_ELEMENTAL);
@@ -819,7 +816,7 @@ public:
                     me->ToTempSummon()->GetSummoner()->RemoveAurasDueToSpell(SPELL_IRON_ROOTS);
             }
 
-            me->DespawnOrUnsummon(2000);
+            me->ForcedDespawn(2000);
         }
     };
 
@@ -939,7 +936,7 @@ public:
             {
                 DoCast(me, SPELL_LIFEBINDERS_GIFT, true);
                 me->SetFloatValue(OBJECT_FIELD_SCALE_X, 0);
-                me->DespawnOrUnsummon(1000);
+                me->ForcedDespawn(1000);
                 uiLifebindersGiftTimer = 12000;
             }
             else uiLifebindersGiftTimer -= diff;
@@ -985,7 +982,7 @@ public:
                 DoCast(me, SPELL_NATURE_BOMB);
                 if (GameObject* pBomb = me->FindNearestGameObject(OBJECT_NATURE_BOMB, 1))
                     me->RemoveGameObject(pBomb, true);
-                me->DespawnOrUnsummon(2000);
+                me->ForcedDespawn(2000);
                 uiExplosionTimer = 10000;
             }
             else uiExplosionTimer -= diff;

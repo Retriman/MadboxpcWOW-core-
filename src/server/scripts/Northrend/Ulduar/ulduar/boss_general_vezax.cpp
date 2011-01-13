@@ -304,7 +304,7 @@ public:
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
                 me->RemoveAllAuras();
                 me->SetHealth(me->GetMaxHealth());
-                me->DespawnOrUnsummon(30000);
+                me->ForcedDespawn(30000);
                 me->GetMotionMaster()->Initialize();
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
                 DoCast(me, SPELL_SARONITE_VAPOR);
