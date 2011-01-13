@@ -355,7 +355,7 @@ public:
                                 case 3: // Tower of Frost
                                     pLeviathan->AI()->DoAction(3);
                                     break;
-                                case 4: // Tower of Nature
+                                case 4: // Tower of Life
                                     pLeviathan->AI()->DoAction(4);
                                     break;
                                 default:
