@@ -3,7 +3,7 @@ UPDATE `creature_template` SET `spell1`=69495,`VehicleId`='452' WHERE `entry`=34
 -- Horde Gunship Cannon
 UPDATE `creature_template` SET `spell1`=68825,`VehicleId`='453' WHERE `entry`=34935;
 -- Keep Cannon
-UPDATE `creature_template` SET `VehicleId`=160,`spell1`=67452,`spell2`='68169' WHERE `entry` =34944;
+UPDATE `creature_template` SET `VehicleId`=160,`spell1`=67452,`spell2`=68169, MovementType =0, speed_walk =0, speed_run =0, mechanic_immune_mask =67110928 WHERE `entry` =34944;
 -- Catapult
 UPDATE `creature_template` SET `VehicleId`=438,`spell1`=66218,`spell2`=66296 WHERE `entry`=34793;
 -- Demolisher
