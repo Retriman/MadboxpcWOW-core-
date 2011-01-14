@@ -18,3 +18,5 @@ INSERT INTO `disables` (`sourceType`, `entry`, `flags`, `comment`) VALUES
 (0, 53260, 1, 'Cobra Strikes Rank 3 - Fixear Mele hit sobre owner.'),
 (0, 53256, 1, 'Cobra Strikes Rank 1 - Fixear Mele hit sobre owner.'),
 (0, 53259, 1, 'Cobra Strikes Rank 2 - Fixear Mele hit sobre owner.');
+
+UPDATE `disables` SET `flags` = '14' WHERE `disables`.`sourceType` =2 AND `disables`.`entry` =649 LIMIT 1 ;
