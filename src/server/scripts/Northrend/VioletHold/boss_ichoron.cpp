@@ -401,7 +401,7 @@ public:
                         {
                             if (pIchoron->AI())
                                 pIchoron->AI()->DoAction(ACTION_WATER_ELEMENT_HIT);
-                            me->ForcedDespawn();
+                            me->DespawnOrUnsummon();
                         }
                     }
                 }

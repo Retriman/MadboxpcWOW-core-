@@ -104,7 +104,7 @@ public:
         {
             if (pInstance && pInstance->GetData(DATA_REMOVE_NPC) == 1)
             {
-                me->ForcedDespawn();
+                me->DespawnOrUnsummon();
                 pInstance->SetData(DATA_REMOVE_NPC, 0);
             }
 
