@@ -2572,37 +2572,23 @@ public:
 ## Emergency Supplies
 ######*/
 
-<<<<<<< HEAD
 #define GOSSIP_ITEM_RECON           "Search the body for the pilot's insignia."
 #define GOSSIP_ITEM_SUPPLIES        "Search the body for the pilot's emergancy toolkit."
 
 enum FizzcrankReconPilot 
 {
     GOSSIP_ID                   = 12489,
-    QUEST_EMERGENCY_PROTOCOL_C  = 11795,
-    QUEST_EMERGENCY_SUPPLIES    = 11887,
-    SPELL_GIVE_EMERGENCY_KIT    = 46362,
-    SPELL_SUMMON_PILOT_INSIGNIA = 46166,
-=======
-#define GOSSIP_ITEM_RECON 			"Search the body for the pilot's insignia."
-#define GOSSIP_ITEM_SUPPLIES 		"Search the body for the pilot's emergancy toolkit."
-
-enum FizzcrankReconPilot 
-{
-	GOSSIP_ID 					= 12489,
-	QUEST_EMERGENCY_PROTOCOL_C	= 11795,
-	QUEST_EMERGENCY_SUPPLIES	= 11887,
-	SPELL_GIVE_EMERGENCY_KIT	= 46362,
-	SPELL_SUMMON_PILOT_INSIGNIA	= 46166,
->>>>>>> 00c2e94188d5c64e4fd9d3215b4975f2773fdd22
+	QUEST_EMERGENCY_PROTOCOL_C  = 11795,
+	QUEST_EMERGENCY_SUPPLIES    = 11887,
+	SPELL_GIVE_EMERGENCY_KIT    = 46362,
+	SPELL_SUMMON_PILOT_INSIGNIA = 46166
 };
 
 class npc_fizzcrank_recon_pilot : public CreatureScript
 {
 public:
     npc_fizzcrank_recon_pilot() : CreatureScript("npc_fizzcrank_recon_pilot") { } 
-<<<<<<< HEAD
-    
+
     bool OnGossipHello(Player* pPlayer, Creature* pCreature)
     {
         if (pPlayer->GetQuestStatus(QUEST_EMERGENCY_PROTOCOL_C) == QUEST_STATUS_INCOMPLETE)
@@ -2618,30 +2604,13 @@ public:
         return true;
     }
 
-=======
-
-    bool OnGossipHello(Player* pPlayer, Creature* pCreature)
-    {
-        if (pPlayer->GetQuestStatus(QUEST_EMERGENCY_PROTOCOL_C) == QUEST_STATUS_INCOMPLETE)
-		{
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_RECON, GOSSIP_SENDER_INFO, GOSSIP_ACTION_INFO_DEF+1);
-		}
-			
-		if (pPlayer->GetQuestStatus(QUEST_EMERGENCY_SUPPLIES) == QUEST_STATUS_INCOMPLETE)
-		{
-			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_SUPPLIES, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
-		}
-        pPlayer->SEND_GOSSIP_MENU(GOSSIP_ID, pCreature->GetGUID());
-		return true;
-    }
->>>>>>> 00c2e94188d5c64e4fd9d3215b4975f2773fdd22
     bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 uiAction)
     {
         pPlayer->PlayerTalkClass->ClearMenus();
         switch (uiAction)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-<<<<<<< HEAD
+
                 pPlayer->CLOSE_GOSSIP_MENU();
                 pCreature->CastSpell(pPlayer, SPELL_SUMMON_PILOT_INSIGNIA, true);
                 pCreature->DisappearAndDie();
@@ -2651,17 +2620,6 @@ public:
                 pCreature->CastSpell(pPlayer, SPELL_GIVE_EMERGENCY_KIT, true);
                 pCreature->DisappearAndDie();
                 break;
-=======
-				pPlayer->CLOSE_GOSSIP_MENU();
-				pCreature->CastSpell(pPlayer, SPELL_SUMMON_PILOT_INSIGNIA, true);
-                pCreature->DisappearAndDie();
-                break;
-			case GOSSIP_ACTION_INFO_DEF+2:
-				pPlayer->CLOSE_GOSSIP_MENU();
-				pCreature->CastSpell(pPlayer, SPELL_GIVE_EMERGENCY_KIT, true);
-				pCreature->DisappearAndDie();
-				break;
->>>>>>> 00c2e94188d5c64e4fd9d3215b4975f2773fdd22
         }
         return true;
     }   
