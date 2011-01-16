@@ -1778,6 +1778,10 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
         // Empower Rune Weapon
         case 53258:
             return; // skip, hack-added in spell effect
+        // Monstrous Bite
+        case 54681:
+            m_caster->CastSpell(m_caster, 54681, true);
+            return;
         // Snake Trap
         case 57879:
             originalCaster = m_originalCaster;
