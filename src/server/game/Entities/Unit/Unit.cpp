@@ -6521,13 +6521,13 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
                 // Judgement of Light
                 case 20185:
                 {
-                    if (pVictim->getPowerType() == POWER_MANA)
+                    if (pVictim)
                     {
-                        // 2% of base mana
+                        // 2% of base hp
                         basepoints0 = int32(pVictim->CountPctFromMaxHealth(2));
                         pVictim->CastCustomSpell(pVictim, 20267, &basepoints0, 0, 0, true, 0, triggeredByAura);
                     }
-                        return true;
+                    return true;
                 }
                 // Judgement of Wisdom
                 case 20186:
