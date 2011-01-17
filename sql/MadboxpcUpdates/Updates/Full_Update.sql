@@ -232,3 +232,11 @@ INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comm
 (19574, -32416, 2, 'Bestial Wrath immune at Hammer of Justice'),
 (19574, -20066, 2, 'Bestial Wrath immune at Repentance');
 
+-- 17_01_2010_world_spell_pet_auras.sql
+-- Fix [Hunter] Talento Ferocious inspiration
+DELETE FROM `spell_pet_auras` WHERE `spell` IN ('34455','34459','34460');
+INSERT INTO `spell_pet_auras` (`spell`, `effectId`, `pet`, `aura`) VALUES
+('34455','0','0','75593'), -- Ferocious Inspiration (Rank 1)
+('34459','0','0','75446'), -- Ferocious Inspiration (Rank 2)
+('34460','0','0','75447'); -- Ferocious Inspiration (Rank 3)
+
