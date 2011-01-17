@@ -1,4 +1,8 @@
 -- Alliance Gunship Cannon
+UPDATE `creature_template` SET `speed_walk` = 0, `speed_run` = 0, `mechanic_immune_mask` = 67110928 WHERE `entry` = 34929;
+-- Horde Gunship Cannon
+UPDATE `creature_template` SET `speed_walk` = 0, `speed_run` = 0, `mechanic_immune_mask` = 67110928 WHERE `entry` = 34935;
+-- Alliance Gunship Cannon
 UPDATE `creature_template` SET `spell1`=69495,`VehicleId`='452' WHERE `entry`=34929;
 -- Horde Gunship Cannon
 UPDATE `creature_template` SET `spell1`=68825,`VehicleId`='453' WHERE `entry`=34935;
