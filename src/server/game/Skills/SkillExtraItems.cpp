@@ -104,7 +104,7 @@ void LoadSkillExtraItemTable()
         uint32 newItemId = fields[4].GetUInt32();
         if (newItemId < 0)
         {
-            sLog.outError("Skill specialization %u has newItemId lower than 0 in `skill_extra_item_template`!", spellId);
+            sLog->outError("Skill specialization %u has newItemId lower than 0 in `skill_extra_item_template`!", spellId);
             continue;
         }
         
