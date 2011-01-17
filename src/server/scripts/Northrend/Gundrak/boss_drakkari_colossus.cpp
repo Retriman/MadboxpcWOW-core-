@@ -152,7 +152,7 @@ public:
                     if (pCreature && pCreature->isAlive())
                     {
                         pCreature->SetVisible(false);
-                        pCreature->DespawnOrUnsummon();
+                        pCreature->ForcedDespawn();
                     }
                 }
                 MojoGUID[i] = 0;

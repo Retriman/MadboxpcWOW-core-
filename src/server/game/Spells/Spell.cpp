@@ -1793,15 +1793,19 @@ void Spell::SearchChainTarget(std::list<Unit*> &TagUnitMap, float max_range, uin
             tempUnitMap.sort(Trinity::ObjectDistanceOrderPred(cur));
             next = tempUnitMap.begin();
 
-            if (cur->GetDistance(*next) > CHAIN_SPELL_JUMP_RADIUS)
+            if (cur->GetDistance(*next) > CHAIN_SPELL_JUMP_RADIUS)      // Don't search beyond the max jump radius
                 break;
-            while ((m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE
+
+            // Check if (*next) is a valid chain target. If not, don't add to TagUnitMap, and repeat loop.
+            // If you want to add any conditions to exclude a target from TagUnitMap, add condition in this while() loop.
+            while ((m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE   
                 && !m_caster->isInFrontInMap(*next, max_range))
                 || !m_caster->canSeeOrDetect(*next)
-                || !cur->IsWithinLOSInMap(*next))
+                || !cur->IsWithinLOSInMap(*next)
+                || ((GetSpellInfo()->AttributesEx6 & SPELL_ATTR6_IGNORE_CROWD_CONTROL_TARGETS) && !(*next)->CanFreeMove()))
             {
                 ++next;
-                if (next == tempUnitMap.end() || cur->GetDistance(*next) > CHAIN_SPELL_JUMP_RADIUS)
+                if (next == tempUnitMap.end() || cur->GetDistance(*next) > CHAIN_SPELL_JUMP_RADIUS) // Don't search beyond the max jump radius
                     return;
             }
         }
@@ -5785,6 +5789,11 @@ SpellCastResult Spell::CheckCasterAuras() const
         if (m_spellInfo->Id == 42292 || m_spellInfo->Id == 59752)
             mechanic_immune = IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK;
     }
+
+    // Glyph of Pain Suppression
+    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST && m_spellInfo->SpellIconID == 2178)
+        if (m_caster->HasAuraEffect(63248, 0))      // no SpellFamilyFlags or SpellIconID to identify this
+            mechanic_immune = 1 << MECHANIC_STUN;   // "immune" to stun only for this cast
 
     // Check whether the cast should be prevented by any state you might have.
     SpellCastResult prevented_reason = SPELL_CAST_OK;

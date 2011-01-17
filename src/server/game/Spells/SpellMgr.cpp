@@ -768,6 +768,9 @@ bool SpellMgr::_isPositiveEffect(uint32 spellId, uint32 effIndex, bool deep) con
             // Amplify Magic, Dampen Magic
             if (spellproto->SpellFamilyFlags[0] == 0x00002000)
                 return true;
+            // Ignite
+            if (spellproto->SpellIconID == 45)
+                return true;
             break;
         case SPELLFAMILY_PRIEST:
             switch (spellId)
@@ -3935,7 +3938,11 @@ void SpellMgr::LoadSpellCustomAttr()
             count++;
             break;
         case 56278: // Read Pronouncement, missing EffectApplyAuraName
-            spellInfo->Effect[0] = SPELL_EFFECT_DUMMY;
+           spellInfo->Effect[0] = SPELL_EFFECT_DUMMY;
+           count++;
+           break;
+        case 33206: // Pain Suppression
+            spellInfo->AttributesEx5 &= ~SPELL_ATTR5_USABLE_WHILE_STUNNED;
             count++;
             break;
         case 53241: // Marked for Death (Rank 1)

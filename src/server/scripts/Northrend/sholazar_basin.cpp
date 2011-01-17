@@ -1271,7 +1271,7 @@ public:
             {
                 switch (sayStep)
                 {
-                    case 1:
+                    case 0:
                     {
                         switch (me->GetEntry())
                         {
@@ -1283,7 +1283,7 @@ public:
                         sayStep++;
                         break;
                     }
-                    case 2:
+                    case 1:
                     {
                         switch (me->GetEntry())
                         {
@@ -1295,7 +1295,7 @@ public:
                         sayStep++;
                         break;
                     }
-                    case 3:
+                    case 2:
                     {
                         switch (me->GetEntry())
                         {
@@ -1329,17 +1329,17 @@ public:
             {
                 switch (i)
                 {
-                   case 1:
+                   case 0:
                        if (NPC_HEMET != me->GetEntry())
                            continue;
                        else
                            break;
-                   case 2:
+                   case 1:
                        if (NPC_HADRIUS != me->GetEntry())
                            continue;
                        else
                            break;
-                   case 3:
+                   case 2:
                        if (NPC_TAMARA != me->GetEntry())
                            continue;
                        else
@@ -1351,7 +1351,7 @@ public:
 
                 caster->ToPlayer()->KilledMonsterCredit(me->GetEntry(), 0);
                 caster->ToPlayer()->Say(SAY_OFFER, LANG_UNIVERSAL);
-                sayStep = 1;
+                sayStep = 0;
                 break;
             }
         }
