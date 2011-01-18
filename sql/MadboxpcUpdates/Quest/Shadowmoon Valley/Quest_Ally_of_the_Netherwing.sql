@@ -1,6 +1,4 @@
--- Fix quest 10866 - Zuluhed the Whacked 
-UPDATE `quest_template` SET `ReqCreatureOrGOId1` = -185156, `ObjectiveText1` = 'Karynaku freed', `ReqCreatureOrGOId2` = 11980 , `ObjectiveText2` = 'Zuluhed the Whacked slain'  WHERE entry = 10866;
--- Fix quest  Ally of the Netherwing
+-- Quest  Ally of the Netherwing
 DELETE FROM `creature_involvedrelation` WHERE `quest` IN  (10870, 10871);
 DELETE FROM `creature_questrelation` WHERE `quest` IN (10870, 10871);
 INSERT INTO `creature_involvedrelation` (`id`, `quest`) VALUES(22113,10870);
