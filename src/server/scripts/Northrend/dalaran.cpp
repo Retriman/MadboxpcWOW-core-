@@ -247,91 +247,10 @@ public:
     }
 };
 
-/*######
-## Kaluak Fishing Evento
-## 38294 Elder
-## http://www.wowhead.com/quest=24803 "Kalu'ak Fishing Derby"
-######*/
-
-enum Kaluak
-{
-    QUEST_KALUAK_FISHING_DERBY  = 24803,
-    //HOLYDAY_FISHING_KALUAK      = 52, // Mover a SharedDefines.h enum HolidayIds
-};
-
-class npc_kaluak_fishing : public CreatureScript
-{
-public:
-    npc_kaluak_fishing() : CreatureScript("npc_kaluak_fishing") {}
-
-    struct npc_kaluak_fishingAI : public ScriptedAI
-    {
-        npc_kaluak_fishingAI(Creature* pCreature) : ScriptedAI(pCreature)
-        {
-            bEventoEmpieza = bEventoTerminado = bEventoGanadorBusqueda = false;
-            Reset();        
-        }
-
-        bool bEventoEmpieza;
-        bool bEventoTerminado;
-        bool bEventoGanadorBusqueda;
-
-        void Reset() {}
-
-        void Aggro(Unit *who) {}
-
-        void UpdateAI(const uint32 diff)
-        {
-            if (!bEventoEmpieza && time(NULL) % 60 == 0 && IsHolidayActive(HOLYDAY_FISHING_KALUAK))
-            {
-                sLog->outDebug("Kaluak: npc_kaluak_fishing Anuncia Comienzo HOLYDAY_FISHING_KALUAK");                
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                bEventoEmpieza = true;
-            }
-
-            if (bEventoEmpieza && !bEventoTerminado && time(NULL) % 60 == 0 && !IsHolidayActive(HOLYDAY_FISHING_KALUAK))
-            {
-                sLog->outDebug("Kaluak: npc_kaluak_fishing Anuncia Termino HOLYDAY_FISHING_KALUAK");
-                bEventoTerminado = true;
-            }
-            return;
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    bool OnGossipHello(Player* pPlayer, Creature* pCreature)
-    {
-        if (pCreature->isQuestGiver())
-        {
-            pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-            //pPlayer->SEND_GOSSIP_MENU(, pCreature->GetGUID()); Faltante Gosiip ID correcto
-            return true;
-        }
-
-        //pPlayer->SEND_GOSSIP_MENU(, pCreature->GetGUID());  Faltante Gosiip ID correcto
-        return true;
-    }
-
-    bool ChooseReward(Player* pPlayer, Creature* pCreature, const Quest *pQuest, uint32 item)
-    {
-        if (pQuest->GetQuestId() == QUEST_KALUAK_FISHING_DERBY && ((npc_kaluak_fishingAI*)(pCreature->AI()))->bEventoGanadorBusqueda == true)
-        {            
-            pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-            return true;
-       }
-    }
-
-    CreatureAI* GetAI(Creature* pCreature) const
-    {
-        return new npc_kaluak_fishingAI (pCreature);
-    }
-};
-
 void AddSC_dalaran()
 {
     new npc_mageguard_dalaran;
     new npc_hira_snowdawn;
     new npc_archmage_vargoth;
     new npc_steampowered_auctioneer;
-    new npc_kaluak_fishing;
 }
