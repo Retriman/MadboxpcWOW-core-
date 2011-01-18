@@ -2112,6 +2112,7 @@ enum HolidayIds
     HOLIDAY_NONE                     = 0,
 
     HOLIDAY_FIREWORKS_SPECTACULAR    = 62,
+    HOLYDAY_FISHING_KALUAK           = 52,
     HOLIDAY_FEAST_OF_WINTER_VEIL     = 141,
     HOLIDAY_NOBLEGARDEN              = 181,
     HOLIDAY_CHILDRENS_WEEK           = 201,

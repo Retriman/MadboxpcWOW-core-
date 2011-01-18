@@ -5930,7 +5930,11 @@ void AuraEffect::HandleAuraDummy(AuraApplication const * aurApp, uint8 mode, boo
                     if (GetSpellProto()->SpellFamilyFlags[1] & 0x10)
                     {
                         // Final heal only on dispelled or duration end
+<<<<<<< HEAD
                         if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE || aurApp->GetRemoveMode() == AURA_REMOVE_BY_ENEMY_SPELL)
+=======
+                        if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE || aurApp->GetRemoveMode() == AURA_REMOVE_BY_ENEMY_SPELL
+>>>>>>> 7837d6b31370d54a81f8f8927f21c387aa6dd7ac
                         {
                             if (caster)
                            {
