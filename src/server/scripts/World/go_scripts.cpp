@@ -1186,6 +1186,49 @@ public:
     }
 };
 
+/*######
+## go_lab_work_reagents
+######*/
+
+enum
+{
+    QUEST_LAB_WORK                          = 12557,
+    SPELL_WIRHERED_BATWING_KILL_CREDIT      = 51226,
+    SPELL_MUDDY_MIRE_MAGGOT_KILL_CREDIT     = 51227,
+    SPELL_AMBERSEED_KILL_CREDIT             = 51228,
+    SPELL_CHILLED_SERPENT_MUCUS_KILL_CREDIT = 51229,
+    GO_AMBERSEED                            = 190459,
+    GO_CHILLED_SERPENT_MUCUS                = 190462,
+    GO_WITHERED_BATWING                     = 190473,
+    GO_MUDDY_MIRE_MAGGOTS                   = 190478
+};
+
+class go_lab_work_reagents : public GameObjectScript
+{
+public:
+    go_lab_work_reagents() : GameObjectScript("go_lab_work_reagents") { }
+
+	bool OnGossipHello(Player* pPlayer, GameObject* pGo)
+	{
+		if (pPlayer->GetQuestStatus(QUEST_LAB_WORK) == QUEST_STATUS_INCOMPLETE)
+		{
+			uint32 uiCreditSpellId = 0;
+			switch (pGo->GetEntry())
+			{
+				case GO_AMBERSEED:              uiCreditSpellId = SPELL_AMBERSEED_KILL_CREDIT; break;
+				case GO_CHILLED_SERPENT_MUCUS:  uiCreditSpellId = SPELL_CHILLED_SERPENT_MUCUS_KILL_CREDIT; break;
+				case GO_WITHERED_BATWING:       uiCreditSpellId = SPELL_WIRHERED_BATWING_KILL_CREDIT; break;
+				case GO_MUDDY_MIRE_MAGGOTS:     uiCreditSpellId = SPELL_MUDDY_MIRE_MAGGOT_KILL_CREDIT; break;
+			}
+
+			if (uiCreditSpellId)
+				pPlayer->CastSpell(pPlayer, uiCreditSpellId, true);
+		}
+
+		return false;
+	}
+};
+
 void AddSC_go_scripts()
 {
     new go_cat_figurine;
@@ -1224,4 +1267,5 @@ void AddSC_go_scripts()
     new go_amberpine_outhouse;
     new go_hive_pod;
     new go_massive_seaforium_charge;
+    new go_lab_work_reagents;
 }
