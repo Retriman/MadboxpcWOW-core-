@@ -268,8 +268,20 @@ struct boss_faction_championsAI : public ScriptedAI
     void Reset()
     {
         championControllerGUID = 0;
-        CCTimer = rand()%10000;
-        ThreatTimer = 5000;
+        CCTimer = 0;
+        ThreatTimer = 9000;
+    }
+
+    void SpellHit(Unit *pWho, const SpellEntry *pSpell)
+    {
+        DiminishingGroup m_diminishGroup;     
+        m_diminishGroup = GetDiminishingReturnsGroupForSpell(pSpell,pSpell);
+        if (m_diminishGroup)
+        {
+            DiminishingReturnsType type = GetDiminishingReturnsGroupType(m_diminishGroup);
+            if (type == DRTYPE_PLAYER)
+                me->IncrDiminishing(m_diminishGroup);
+        }
     }
 
     void JustReachedHome()
@@ -431,19 +443,27 @@ struct boss_faction_championsAI : public ScriptedAI
         {
             UpdatePower();
             UpdateThreat();
-            ThreatTimer = 4000;
+            ThreatTimer = 9000;
         }
         else ThreatTimer -= uiDiff;
 
-        if (mAIType != AI_PET)
-        {
-            if (CCTimer < uiDiff)
+        if (IsHeroic())
+            if (mAIType != AI_PET)
             {
-                RemoveCC();
-                CCTimer = 8000+rand()%2000;
+                if (CCTimer < uiDiff)
+                {
+                    if (me->HasAuraType(SPELL_AURA_MOD_STUN) 
+                        || me->HasAuraType(SPELL_AURA_MOD_FEAR) 
+                        || me->HasAuraType(SPELL_AURA_MOD_ROOT) 
+                        || me->HasAuraType(SPELL_AURA_MOD_PACIFY) 
+                        || me->HasAuraType(SPELL_AURA_MOD_CONFUSE)) 
+                    {
+                        RemoveCC();
+                        CCTimer = 2*MINUTE*IN_MILLISECONDS;
+                    }
+                }
+                else CCTimer -= uiDiff;
             }
-            else CCTimer -= uiDiff;
-        }
 
         if (mAIType == AI_MELEE || mAIType == AI_PET) DoMeleeAttackIfReady();
     }
@@ -487,9 +507,9 @@ public:
         {
             boss_faction_championsAI::Reset();
             m_uiNatureGraspTimer = IN_MILLISECONDS;
-            m_uiTranquilityTimer = IN_MILLISECONDS;
-            m_uiBarkskinTimer = IN_MILLISECONDS;
-            m_uiCommonTimer = IN_MILLISECONDS;
+            m_uiTranquilityTimer = 9*IN_MILLISECONDS;
+            m_uiBarkskinTimer = 8*IN_MILLISECONDS;
+            m_uiCommonTimer = 3*IN_MILLISECONDS;
             SetEquipmentSlots(false, 51799, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
         }
 
@@ -518,26 +538,29 @@ public:
 
             if (m_uiCommonTimer <= uiDiff)
             {
-                switch (urand(0, 4))
+                if (Unit *pHealTarget = DoSelectLowestHpFriendly(40.0f))
                 {
-                    case 0:
-                        DoCast(me, SPELL_LIFEBLOOM);
-                        break;
-                    case 1:
-                        DoCast(me, SPELL_NOURISH);
-                        break;
-                    case 2:
-                        DoCast(me, SPELL_REGROWTH);
-                        break;
-                    case 3:
-                        DoCast(me, SPELL_REJUVENATION);
-                        break;
-                    case 4:
-                        if (Creature* pTarget = SelectRandomFriendlyMissingBuff(SPELL_THORNS))
-                            DoCast(pTarget, SPELL_THORNS);
-                        break;
+                    switch (urand(0, 4))
+                    {
+                        case 0:
+                            DoCast(pHealTarget,SPELL_LIFEBLOOM);
+                            break;
+                        case 1:
+                            DoCast(pHealTarget,SPELL_NOURISH);
+                            break;
+                        case 2:
+                            DoCast(pHealTarget,SPELL_REGROWTH);
+                            break;
+                        case 3:
+                            DoCast(pHealTarget,SPELL_REJUVENATION);
+                            break;
+                        case 4:
+                            if (Creature* pTarget = SelectRandomFriendlyMissingBuff(SPELL_THORNS))
+                                DoCast(pTarget,SPELL_THORNS);
+                            break;
+                    }
+                    m_uiCommonTimer = urand(5*IN_MILLISECONDS,10*IN_MILLISECONDS);
                 }
-                m_uiCommonTimer = urand(15*IN_MILLISECONDS, 30*IN_MILLISECONDS);
             } else m_uiCommonTimer -= uiDiff;
 
             boss_faction_championsAI::UpdateAI(uiDiff);
@@ -582,8 +605,8 @@ public:
         {
             boss_faction_championsAI::Reset();
             m_uiHeroismOrBloodlustTimer = IN_MILLISECONDS;
-            m_uiHexTimer = IN_MILLISECONDS;
-            m_uiCommonTimer = IN_MILLISECONDS;
+            m_uiHexTimer = 10*IN_MILLISECONDS;
+            m_uiCommonTimer = 5*IN_MILLISECONDS;
             SetEquipmentSlots(false, 49992, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
         }
 
@@ -613,26 +636,29 @@ public:
 
             if (m_uiCommonTimer <= uiDiff)
             {
-                switch (urand(0, 5))
+                if (Unit *pHealTarget = DoSelectLowestHpFriendly(40.0f))
                 {
-                    case 0: case 1:
-                        DoCast(me, SPELL_HEALING_WAVE);
-                        break;
-                    case 2:
-                        DoCast(me, SPELL_RIPTIDE);
-                        break;
-                    case 3:
-                        DoCast(me, SPELL_EARTH_SHOCK);
-                        break;
-                    case 4:
-                        DoCast(me, SPELL_SPIRIT_CLEANSE);
-                        break;
-                    case 5:
-                        if (Unit *pTarget = SelectRandomFriendlyMissingBuff(SPELL_EARTH_SHIELD))
-                            DoCast(pTarget, SPELL_EARTH_SHIELD);
-                        break;
+                    switch (urand(0, 5))
+                    {
+                        case 0: case 1:
+                            DoCast(pHealTarget,SPELL_HEALING_WAVE);
+                            break;
+                        case 2:
+                            DoCast(pHealTarget,SPELL_RIPTIDE);
+                            break;
+                        case 3:
+                            DoCast(me, SPELL_EARTH_SHOCK);
+                            break;
+                        case 4:
+                            DoCast(pHealTarget,SPELL_SPIRIT_CLEANSE);
+                            break;
+                        case 5:
+                            if (Unit *pTarget = SelectRandomFriendlyMissingBuff(SPELL_EARTH_SHIELD))
+                                DoCast(pTarget,SPELL_EARTH_SHIELD);
+                            break;
+                    }
+                    m_uiCommonTimer = urand(5*IN_MILLISECONDS,10*IN_MILLISECONDS);
                 }
-                m_uiCommonTimer = urand(5*IN_MILLISECONDS, 15*IN_MILLISECONDS);
             } else m_uiCommonTimer -= uiDiff;
 
             boss_faction_championsAI::UpdateAI(uiDiff);
@@ -682,7 +708,7 @@ public:
             m_uiHolyShockTimer = urand(6*IN_MILLISECONDS, 15*IN_MILLISECONDS);
             m_uiHandOfFreedomTimer = urand(25*IN_MILLISECONDS, 40*IN_MILLISECONDS);
             m_uiHammerOfJusticeTimer = urand(5*IN_MILLISECONDS, 15*IN_MILLISECONDS);
-            m_uiCommonTimer = urand(15*IN_MILLISECONDS, 30*IN_MILLISECONDS);
+            m_uiCommonTimer = urand(5*IN_MILLISECONDS,10*IN_MILLISECONDS);
             SetEquipmentSlots(false, 50771, 47079, EQUIP_NO_CHANGE);
         }
 
@@ -708,7 +734,7 @@ public:
 
             if (m_uiHolyShockTimer <= uiDiff)
             {
-                if (Unit *pTarget = SelectUnit(SELECT_TARGET_RANDOM, 0))
+                if (Unit *pTarget = DoSelectLowestHpFriendly(40.0f))
                     DoCast(pTarget, SPELL_HOLY_SHOCK);
                 m_uiHolyShockTimer = urand(6*IN_MILLISECONDS, 15*IN_MILLISECONDS);
             } else m_uiHolyShockTimer -= uiDiff;
@@ -729,19 +755,22 @@ public:
 
             if (m_uiCommonTimer <= uiDiff)
             {
-                switch (urand(0, 4))
+                if (Unit *pHealTarget = DoSelectLowestHpFriendly(40.0f))
                 {
-                    case 0: case 1:
-                        DoCast(me, SPELL_FLASH_OF_LIGHT);
-                        break;
-                    case 2: case 3:
-                        DoCast(me, SPELL_HOLY_LIGHT);
-                        break;
-                    case 4:
-                        DoCast(me, SPELL_CLEANSE);
-                        break;
+                    switch (urand(0, 4))
+                    {
+                        case 0: case 1:
+                            DoCast(pHealTarget,SPELL_FLASH_OF_LIGHT);
+                            break;
+                        case 2: case 3:
+                            DoCast(pHealTarget,SPELL_HOLY_LIGHT);
+                            break;
+                        case 4:
+                            DoCast(pHealTarget,SPELL_CLEANSE);
+                            break;
+                    }
+                    m_uiCommonTimer = urand(5*IN_MILLISECONDS,10*IN_MILLISECONDS);
                 }
-                m_uiCommonTimer = urand(15*IN_MILLISECONDS, 30*IN_MILLISECONDS);
             } else m_uiCommonTimer -= uiDiff;
 
             boss_faction_championsAI::UpdateAI(uiDiff);
@@ -798,26 +827,30 @@ public:
 
             if (m_uiCommonTimer <= uiDiff)
             {
-                switch (urand(0, 5))
+                if (Unit *pHealTarget = DoSelectLowestHpFriendly(40.0f))
                 {
-                    case 0:
-                        DoCast(me, SPELL_RENEW);
-                        break;
-                    case 1:
-                        DoCast(me, SPELL_SHIELD);
-                        break;
-                    case 2: case 3:
-                        DoCast(me, SPELL_FLASH_HEAL);
-                        break;
-                    case 4:
-                        if (Unit *pTarget = urand(0, 1) ? SelectUnit(SELECT_TARGET_RANDOM, 0) : DoSelectLowestHpFriendly(40.0f))
-                            DoCast(pTarget, SPELL_DISPEL);
-                        break;
-                    case 5:
-                        DoCast(me, SPELL_MANA_BURN);
-                        break;
+                    switch (urand(0, 5))
+                    {
+                        case 0:
+                            DoCast(pHealTarget,SPELL_RENEW);
+                            break;
+                        case 1:
+                            DoCast(pHealTarget,SPELL_SHIELD);
+                            break;
+                        case 2: case 3:
+                            DoCast(pHealTarget,SPELL_FLASH_HEAL);
+                            break;
+                        case 4:
+                            if (Unit *pTarget = urand(0,1) ? SelectUnit(SELECT_TARGET_RANDOM,0) : DoSelectLowestHpFriendly(40.0f))
+                                DoCast(pTarget, SPELL_DISPEL);
+                            break;
+                        case 5:
+                            if (Unit *pTarget = SelectUnit(SELECT_TARGET_RANDOM,0))
+                                DoCast(pTarget, SPELL_MANA_BURN);
+                            break;
+                    }
+                    m_uiCommonTimer = urand(5*IN_MILLISECONDS,10*IN_MILLISECONDS);
                 }
-                m_uiCommonTimer = urand(15*IN_MILLISECONDS, 30*IN_MILLISECONDS);
             } else m_uiCommonTimer -= uiDiff;
 
             boss_faction_championsAI::UpdateAI(uiDiff);
