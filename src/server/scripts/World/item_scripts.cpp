@@ -510,6 +510,46 @@ public:
     }
 };
 
+/*####
+## World Events.
+## Lunar Festival - Green Rocket Cluster
+####*/
+
+enum GreenRocket
+{
+    BOSS_OMEN                   = 15467,
+    STORMRAGE_BARROW_DENS_AREA  = 2363
+};
+
+const Position boss_position = 
+{
+    7657.348f, -2909.398f, 464.586f, 2.985f
+};
+
+class item_green_rocket_cluster : public ItemScript
+{
+public:
+    item_green_rocket_cluster() : ItemScript("item_green_rocket_cluster") { }
+
+    if (!pPlayer)
+        return true;
+
+    bool OnUse(Player* pPlayer, Item* pItem, SpellCastTargets const& /*targets*/)
+    {
+        if (pPlayer->GetAreaId() == STORMRAGE_BARROW_DENS_AREA)
+        {
+            if (Creature* pCreature = pPlayer->FindNearestCreature(BOSS_OMEN, 100, true))
+                if (pCreature->isAlive())
+                    return false;
+
+            pPlayer->SummonCreature(BOSS_OMEN, boss_position, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 180000);
+            return true;
+        }
+        else
+            return false;
+    }
+};
+
 void AddSC_item_scripts()
 {
     new item_only_for_flight;
@@ -526,4 +566,5 @@ void AddSC_item_scripts()
     new item_dehta_trap_smasher;
     new item_trident_of_nazjan;
     new item_captured_frog();
+    new item_green_rocket_cluster();
 }

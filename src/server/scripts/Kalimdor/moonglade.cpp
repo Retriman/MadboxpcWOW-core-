@@ -33,6 +33,7 @@ EndContentData */
 
 #include "ScriptPCH.h"
 #include "ScriptedEscortAI.h"
+#include "Group.h"
 
 /*######
 ## npc_bunthen_plainswind
@@ -577,8 +578,98 @@ public:
 };
 
 /*####
-#
+## World Events.
+## Boss Omen - Lunar Festival 
+## http://www.wowhead.com/npc=15467#comments
 ####*/
+
+enum BossOmenSpells
+{
+    SPELL_STARSHARDS        = 37124,
+    SPELL_CLEAVE            = 19983,
+    MOONGLADE_ZONE_ID       = 493,
+    QUEST_ELUNES_BLESSING   = 8868,
+};
+
+class boss_omen : public CreatureScript
+{
+public:
+    boss_omen() : CreatureScript("boss_omen") { }
+
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new boss_omenAI (pCreature);
+    }
+
+    struct boss_omenAI : public ScriptedAI
+    {
+        boss_omenAI(Creature *pCreature) : ScriptedAI(pCreature)
+        {
+            CleaveTimer = 10000;
+            StarshardsTimer = 7000;
+        }
+
+        uint32 CleaveTimer;
+        uint32 StarshardsTimer;
+
+        void Reset()
+        {
+            CleaveTimer = 10000;
+            StarshardsTimer = 7000;
+        }
+
+        void JustDied(Unit* killer)
+        {
+            if (killer->GetTypeId() == TYPEID_PLAYER)
+            {
+                if (Group* grp = killer->ToPlayer()->GetGroup())
+                {
+                    for (GroupReference *itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
+                        itr->getSource()->CompleteQuest(QUEST_ELUNES_BLESSING);
+                }
+                else
+                    killer->ToPlayer()->CompleteQuest(QUEST_ELUNES_BLESSING);
+            }
+        }
+
+        void EnterCombat(Unit* /*who*/)
+        {
+            CleaveTimer = 10000;
+            StarshardsTimer = 7000;
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            if (me->GetZoneId() != MOONGLADE_ZONE_ID)
+            {
+                me->AttackStop();
+                me->CastStop();
+                me->ForcedDespawn();
+                return;
+            }
+
+            if (CleaveTimer <= diff)
+            {
+                DoCast(me->getVictim(), SPELL_CLEAVE);
+                CleaveTimer = 10000;
+            }
+            else CleaveTimer -= diff;
+
+            if (StarshardsTimer <= diff)
+            {
+                //if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                DoCastAOE(SPELL_STARSHARDS);
+                StarshardsTimer = 5000;
+            }
+            else StarshardsTimer -= diff;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+};
 
 void AddSC_moonglade()
 {
@@ -587,4 +678,5 @@ void AddSC_moonglade()
     new npc_silva_filnaveth();
     new npc_clintar_dreamwalker();
     new npc_clintar_spirit();
+    new boss_omen();
 }
