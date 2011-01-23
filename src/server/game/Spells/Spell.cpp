@@ -5180,7 +5180,7 @@ SpellCastResult Spell::CheckCast(bool strict)
 
                         if ((1 << aura->GetSpellProto()->Dispel) & dispelMask)
                         {
-                            bool positive = aurApp->IsPositive() ? !(aura->GetSpellProto()->AttributesEx & SPELL_ATTR_EX_NEGATIVE) : false;
+                            bool positive = aurApp->IsPositive() ? !(aura->GetSpellProto()->AttributesEx & SPELL_ATTR1_NEGATIVE) : false;
 
                             // Can only dispel positive auras on enemies and negative on allies
                             if (positive != target->IsFriendlyTo(m_caster))
