@@ -1,7 +1,7 @@
 -- [Mobs] Bestias raras de Northrend Spawn Arctic Cloud - Cinder Cloud - Steam Cloud
 -- Northrend Cloud spawns and pooling
 SET @POOL := 202482; -- SELECT `entry` FROM  `pool_template` ORDER BY `entry` DESC LIMIT 1 ;
-SET @GUID := 3849615; -- SELECT `guid` FROM  `creature` ORDER BY `guid` DESC LIMIT 1 ;
+SET @GUID := 3849620; -- SELECT `guid` FROM  `creature` ORDER BY `guid` DESC LIMIT 1 ;
 
 SET @Artic  := 24879; -- Arctic Cloud
 SET @Cinder := 32522; -- Cinder Cloud
