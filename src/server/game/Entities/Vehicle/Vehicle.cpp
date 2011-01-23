@@ -56,7 +56,7 @@ Vehicle::Vehicle(Unit *unit, VehicleEntry const *vehInfo) : me(unit), m_vehicleI
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ROOT, true);
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_DECREASE_SPEED, true);
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
-            me->ApplySpellImmune(0, IMMUNITY_ID, 49560, true); // Death Grip jump effect
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
             break;
         default:
             break;
@@ -328,7 +328,7 @@ bool Vehicle::AddPassenger(Unit *unit, int8 seatId, bool byAura)
     if (seat->second.seatInfo->m_flags && !(seat->second.seatInfo->m_flags & VEHICLE_SEAT_FLAG_UNK11))
         unit->AddUnitState(UNIT_STAT_ONVEHICLE);
 
-    unit->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT | MOVEMENTFLAG_ROOT);
+    unit->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
     VehicleSeatEntry const *veSeat = seat->second.seatInfo;
     unit->m_movementInfo.t_pos.m_positionX = veSeat->m_attachmentOffsetX;
     unit->m_movementInfo.t_pos.m_positionY = veSeat->m_attachmentOffsetY;
@@ -368,11 +368,9 @@ bool Vehicle::AddPassenger(Unit *unit, int8 seatId, bool byAura)
                 me->ToCreature()->AI()->PassengerBoarded(unit, seat->first, true);
 
             // update all passenger's positions
-            RelocatePassengers(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
+            RelocatePassengers(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0);
         }
     }
-    unit->DestroyForNearbyPlayers();
-    unit->UpdateObjectVisibility(false);
 
     if (GetBase()->GetTypeId() == TYPEID_UNIT)
         sScriptMgr->OnAddPassenger(this, unit, seatId);

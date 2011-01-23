@@ -267,7 +267,7 @@ public:
                 {
                     case EVENT_FREEZE:
                         DoCastAOE(SPELL_FREEZE);
-                        events.ScheduleEvent(EVENT_FREEZE, urand(30000, 35000));
+                        events.CancelEvent(EVENT_FREEZE);
                         break;
                     case EVENT_ICICLE:
                         if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
@@ -288,6 +288,7 @@ public:
                         }
                         DoCast(SPELL_FLASH_FREEZE);
                         events.RescheduleEvent(EVENT_ICICLE, 15000);
+                        events.ScheduleEvent(EVENT_FREEZE, urand(30000, 35000));
                         events.ScheduleEvent(EVENT_FLASH_CAST, 50000);
                         events.ScheduleEvent(EVENT_FLASH_EFFECT, 9000);
                         break;
@@ -534,7 +535,7 @@ public:
             if (DispelTimer < uiDiff)
             {
                 std::list<Player*> players;
-                Trinity::AnyPlayerInObjectRangeCheck checker(me, 30, true);
+                Trinity::AnyPlayerInObjectRangeCheck checker(me, 30);
                 Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
                 me->VisitNearbyWorldObject(30, searcher);
                 if (!players.empty())
@@ -606,7 +607,7 @@ public:
             if (StormTimer <= uiDiff)
             {
                 std::list<Player*> players;
-                Trinity::AnyPlayerInObjectRangeCheck checker(me, 30, true);
+                Trinity::AnyPlayerInObjectRangeCheck checker(me, 30);
                 Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
                 me->VisitNearbyWorldObject(30, searcher);
                 if (!players.empty())
@@ -822,7 +823,7 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_PACIFIED);
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
             me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
-            me->setFaction(25865);
+            me->SetDisplayId(25865);
             me->setFaction(14);
         }
 

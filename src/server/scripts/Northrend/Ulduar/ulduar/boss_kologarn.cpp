@@ -19,7 +19,7 @@
 SDName: Kologarn
 SDAuthor: PrinceCreed
 SD%Complete: 100%
-SD%Comments:
+SD%Comments: Kologarn's vehicleid is wrong.
 EndScriptData */
 
 #include "ScriptPCH.h"

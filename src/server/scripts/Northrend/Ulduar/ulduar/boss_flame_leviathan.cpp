@@ -370,18 +370,32 @@ public:
             _JustDied();
             DoScriptText(SAY_DEATH, me);
 
-            switch (towerCount)
+            if (instance)
             {
-                case 4:
-                    instance->DoCompleteAchievement(RAID_MODE(ACHIEV_10_ORBIT_UARY, ACHIEV_25_ORBIT_UARY));
-                case 3:
-                    instance->DoCompleteAchievement(RAID_MODE(ACHIEV_10_NUKED_FROM_ORBIT, ACHIEV_25_NUKED_FROM_ORBIT));
-                case 2:
-                    instance->DoCompleteAchievement(RAID_MODE(ACHIEV_10_ORBITAL_DEVASTATION, ACHIEV_25_ORBITAL_DEVASTATION));
-                case 1:
-                    instance->DoCompleteAchievement(RAID_MODE(ACHIEV_10_ORBITAL_BOMBARDMENT, ACHIEV_25_ORBITAL_BOMBARDMENT));
-                default:
-                    break;
+                Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                if (!players.isEmpty())
+                {
+                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                    {
+                        Player* pPlayer = itr->getSource();
+                        if (pPlayer)
+                            me->GetMap()->ToInstanceMap()->PermBindAllPlayers(pPlayer);
+                    }
+                }
+
+                switch (towerCount)
+                {
+                    case 4:
+                        instance->DoCompleteAchievement(RAID_MODE(ACHIEV_10_ORBIT_UARY, ACHIEV_25_ORBIT_UARY));
+                    case 3:
+                        instance->DoCompleteAchievement(RAID_MODE(ACHIEV_10_NUKED_FROM_ORBIT, ACHIEV_25_NUKED_FROM_ORBIT));
+                    case 2:
+                        instance->DoCompleteAchievement(RAID_MODE(ACHIEV_10_ORBITAL_DEVASTATION, ACHIEV_25_ORBITAL_DEVASTATION));
+                    case 1:
+                        instance->DoCompleteAchievement(RAID_MODE(ACHIEV_10_ORBITAL_BOMBARDMENT, ACHIEV_25_ORBITAL_BOMBARDMENT));
+                    default:
+                        break;
+                }
             }
         }
 

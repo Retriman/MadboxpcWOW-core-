@@ -152,7 +152,6 @@ enum Npcs
 {
     NPC_VX_001                                  = 33651,
     NPC_AERIAL_UNIT                             = 33670,
-    NPC_ROCKET                                  = 34050,
     NPC_BURST_TARGET                            = 34211,
     NPC_JUNK_BOT                                = 33855,
     NPC_ASSAULT_BOT                             = 34057,
@@ -258,7 +257,6 @@ public:
             checkBotAlive = true;
             Enraged = false;
             DespawnCreatures(34362, 100);
-            DespawnCreatures(NPC_ROCKET, 100);
         }
         
         void JustDied(Unit *victim)
@@ -360,7 +358,6 @@ public:
                                             pLeviathan->DisappearAndDie();
                                             pVX_001->DisappearAndDie();
                                             pAerialUnit->DisappearAndDie();
-                                            DespawnCreatures(NPC_ROCKET, 100);
                                             me->Kill(me, false);
                                             checkBotAlive = true;
                                         }
@@ -450,15 +447,6 @@ public:
                                 if (Creature *pVX_001 = me->SummonCreature(NPC_VX_001, 2744.65f, 2569.46f, 364.397f, 3.14159f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
                                 {
                                     instance->SetData(DATA_MIMIRON_ELEVATOR, GO_STATE_ACTIVE_ALTERNATIVE);
-                                    pVX_001->SetVisible(true);
-                                    for (uint8 n = 5; n < 7; n++)
-                                    {
-                                        if (Creature* Rocket = me->SummonCreature(NPC_ROCKET, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_MANUAL_DESPAWN))
-                                        {
-                                            Rocket->SetReactState(REACT_PASSIVE);
-                                            Rocket->EnterVehicle(pVX_001->GetVehicleKit(), n);
-                                        }
-                                    }
                                 }
                             }
                             JumpToNextStep(8000);
@@ -525,10 +513,7 @@ public:
                         case 3:
                             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STAND);
                             if (instance)
-                            {
-                                if (Creature *pAerialUnit = me->SummonCreature(NPC_AERIAL_UNIT, 2744.65f, 2569.46f, 380, 3.14159f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
-                                    pAerialUnit->SetVisible(true);
-                            }
+                                me->SummonCreature(NPC_AERIAL_UNIT, 2744.65f, 2569.46f, 380, 3.14159f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
                             JumpToNextStep(5000);
                             break;
                         case 4:
@@ -572,23 +557,17 @@ public:
                             {
                                 DoScriptText(SAY_AERIAL_DEATH, me);
                                 if (Creature *pLeviathan = me->GetCreature(*me, instance->GetData64(DATA_LEVIATHAN_MK_II)))
-                                    pLeviathan->GetMotionMaster()->MoveTargetedHome();
+                                    if (Creature *pVX_001 = me->GetCreature(*me, instance->GetData64(DATA_VX_001)))
+                                    {
+                                        pLeviathan->GetMotionMaster()->MoveTargetedHome();
+                                        pVX_001->SetStandState(UNIT_STAND_STATE_STAND);
+                                        pVX_001->EnterVehicle(pLeviathan->GetVehicleKit(), 7);
+                                        me->EnterVehicle(pVX_001->GetVehicleKit(), 1);
+                                    }
                             }
-                            JumpToNextStep(5000);
+                            JumpToNextStep(8000);
                             break;
                         case 2:
-                            if (instance)
-                                if (Creature *pVX_001 = me->GetCreature(*me, instance->GetData64(DATA_VX_001)))
-                                    if (Creature *pLeviathan = me->GetCreature(*me, instance->GetData64(DATA_LEVIATHAN_MK_II)))
-                                    {
-                                        pVX_001->SetStandState(UNIT_STAND_STATE_STAND);
-                                        pVX_001->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
-                                        pVX_001->EnterVehicle(pLeviathan->GetVehicleKit(), 7);
-                                        DespawnCreatures(NPC_ROCKET, 100);
-                                    }
-                            JumpToNextStep(2000);
-                            break;
-                        case 3:
                             if (instance)
                                 if (Creature *pVX_001 = me->GetCreature(*me, instance->GetData64(DATA_VX_001)))
                                     if (Creature *pAerialUnit = me->GetCreature(*me, instance->GetData64(DATA_AERIAL_UNIT)))
@@ -596,19 +575,10 @@ public:
                                         DoScriptText(SAY_V07TRON_ACTIVATE, me);
                                         pAerialUnit->SetFlying(false);
                                         pAerialUnit->EnterVehicle(pVX_001->GetVehicleKit(), 3);
-                                        me->EnterVehicle(pVX_001->GetVehicleKit(), 1);
-                                        for (uint8 n = 5; n < 7; n++)
-                                        {
-                                            if (Creature* Rocket = me->SummonCreature(NPC_ROCKET, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_MANUAL_DESPAWN))
-                                            {
-                                                Rocket->SetReactState(REACT_PASSIVE);
-                                                Rocket->EnterVehicle(pVX_001->GetVehicleKit(), n);
-                                            }
-                                        }
                                     }
                             JumpToNextStep(10000);
                             break;
-                        case 4:
+                        case 3:
                             if (instance)
                             {
                                 if (Creature *pLeviathan = me->GetCreature(*me, instance->GetData64(DATA_LEVIATHAN_MK_II)))
@@ -1006,7 +976,6 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
             me->SetReactState(REACT_PASSIVE);
             me->SetStandState(UNIT_STAND_STATE_STAND);
-            me->SetVisible(false);
             me->RemoveAllAuras();
             phase = PHASE_NULL;
             events.SetPhase(PHASE_NULL);
@@ -1053,7 +1022,8 @@ public:
                 case DO_VX001_ASSEMBLED:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     me->SetHealth(int32(me->GetMaxHealth() / 2));
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    //me->SetStandState(UNIT_STAND_STATE_STAND);
                     phase = PHASE_VX001_ASSEMBLED;
                     events.SetPhase(PHASE_VX001_ASSEMBLED);
                     events.RescheduleEvent(EVENT_PRE_LASER_BARRAGE, urand(35000, 40000), 0, PHASE_VX001_SOLO); // not works in phase 4
@@ -1225,7 +1195,6 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
             me->SetReactState(REACT_PASSIVE);
             me->SetStandState(UNIT_STAND_STATE_STAND);
-            me->SetVisible(false);
             me->RemoveAllAuras();
             me->SetFlying(true);
             phase = PHASE_NULL;

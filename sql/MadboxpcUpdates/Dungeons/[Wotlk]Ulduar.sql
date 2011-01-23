@@ -1373,4 +1373,5 @@ UPDATE `creature_template` SET `mechanic_immune_mask` = 650854235 WHERE `entry` 
 UPDATE `creature_template` SET `mechanic_immune_mask` = 650854235, `flags_extra` = 256 WHERE `entry` = 33524;
 UPDATE `creature_template` SET `mechanic_immune_mask` = 650854235, `flags_extra` = 256 WHERE `entry` = 34152;
 
+UPDATE `creature_template` SET `faction_A` = 16, `faction_H` = 16 WHERE `entry` = 34114;
 

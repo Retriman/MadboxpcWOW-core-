@@ -155,7 +155,7 @@ enum FreyaNpcs
     NPC_STORM_LASHER                            = 32919,
     NPC_SNAPLASHER                              = 32916,
     NPC_NATURE_BOMB                             = 34129,
-    OBJECT_NATURE_BOMB                          = 194902,
+    GOB_NATURE_BOMB                             = 194902,
     NPC_EONARS_GIFT                             = 33228,
     NPC_HEALTHY_SPORE                           = 33215,
     NPC_UNSTABLE_SUN_BEAM                       = 33050
@@ -980,7 +980,7 @@ public:
             if (uiExplosionTimer <= diff)
             {
                 DoCast(me, SPELL_NATURE_BOMB);
-                if (GameObject* pBomb = me->FindNearestGameObject(OBJECT_NATURE_BOMB, 1))
+                if (GameObject* pBomb = me->FindNearestGameObject(GOB_NATURE_BOMB, 1))
                     me->RemoveGameObject(pBomb, true);
                 me->ForcedDespawn(2000);
                 uiExplosionTimer = 10000;
@@ -1158,9 +1158,16 @@ public:
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             me->SetInCombatWithZone();
-            DoCast(me, SPELL_HEALTHY_SPORE_VISUAL);
-            DoCast(me, SPELL_POTENT_PHEROMONES);
-            DoCast(me, SPELL_GROW);
+        }
+        
+        void UpdateAI(const uint32 diff)
+        {
+            if (!me->HasAura(SPELL_HEALTHY_SPORE_VISUAL))
+            {
+                DoCast(me, SPELL_HEALTHY_SPORE_VISUAL);
+                DoCast(me, SPELL_POTENT_PHEROMONES);
+                DoCast(me, SPELL_GROW);
+            }
         }
     };
 

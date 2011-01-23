@@ -428,7 +428,7 @@ void Unit::SendMonsterMoveTransport(Unit *vehicleOwner)
     data << GetPositionZ() - vehicleOwner->GetPositionZ();
     data << uint32(getMSTime());            // should be an increasing constant that indicates movement packet count
     data << uint8(SPLINETYPE_FACING_ANGLE); 
-    data << GetOrientation();               // facing angle?
+    data << GetTransOffsetO();              // facing angle
     data << uint32(SPLINEFLAG_TRANSPORT);
     data << uint32(GetTransTime());         // move time
     data << uint32(1);                      // amount of waypoints
@@ -515,7 +515,7 @@ bool Unit::HasAuraTypeWithFamilyFlags(AuraType auraType, uint32 familyName, uint
 
 void Unit::DealDamageMods(Unit *pVictim, uint32 &damage, uint32* absorb)
 {
-    if (!pVictim->isAlive() || pVictim->HasUnitState(UNIT_STAT_IN_FLIGHT) || (pVictim->HasUnitState(UNIT_STAT_ONVEHICLE) && pVictim->GetVehicleBase() != this) || (pVictim->GetTypeId() == TYPEID_UNIT && pVictim->ToCreature()->IsInEvadeMode()))
+    if (!pVictim->isAlive() || pVictim->HasUnitState(UNIT_STAT_IN_FLIGHT) || (pVictim->HasUnitState(UNIT_STAT_ONVEHICLE) && !pVictim->IsHostileTo(this)) || (pVictim->GetTypeId() == TYPEID_UNIT && pVictim->ToCreature()->IsInEvadeMode()))
     {
             if (absorb)
                 *absorb += damage;
@@ -1773,7 +1773,7 @@ void Unit::CalcAbsorbResist(Unit *pVictim, SpellSchoolMask schoolMask, DamageEff
             // absorb must be smaller than the damage itself
             splitDamage = RoundToInterval(splitDamage, 0, int32(dmgInfo.GetDamage()));
 
-            dmgInfo.AbsorbDamage(splitDamage);
+            dmgInfo.ModifyDamage(-splitDamage);
 
             uint32 splitted = splitDamage;
             uint32 splitted_absorb = 0;
@@ -16429,10 +16429,6 @@ void Unit::EnterVehicle(Vehicle *vehicle, int8 seatId, AuraApplication const * a
     {
         WorldPacket data(SMSG_ON_CANCEL_EXPECTED_RIDE_VEHICLE_AURA, 0);
         thisPlr->GetSession()->SendPacket(&data);
-
-        data.Initialize(SMSG_BREAK_TARGET, 7);
-        data.append(vehicle->GetBase()->GetPackGUID());
-        thisPlr->GetSession()->SendPacket(&data);
     }
 
     SetControlled(true, UNIT_STAT_ROOT);
@@ -16489,7 +16485,7 @@ void Unit::ExitVehicle()
 
     SetControlled(false, UNIT_STAT_ROOT);
 
-    RemoveUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT | MOVEMENTFLAG_ROOT);
+    RemoveUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
     m_movementInfo.t_pos.Relocate(0, 0, 0, 0);
     m_movementInfo.t_time = 0;
     m_movementInfo.t_seat = 0;
@@ -16534,10 +16530,6 @@ void Unit::BuildMovementPacket(ByteBuffer *data) const
         default:
             break;
     }
-
-    if (GetVehicle())
-        if (!this->HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
-            sLog->outError("Unit does not have MOVEMENTFLAG_ROOT but is in vehicle!");
 
     *data << uint32(GetUnitMovementFlags()); // movement flags
     *data << uint16(m_movementInfo.flags2);    // 2.3.0
