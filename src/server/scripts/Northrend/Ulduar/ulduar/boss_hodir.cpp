@@ -535,7 +535,7 @@ public:
             if (DispelTimer < uiDiff)
             {
                 std::list<Player*> players;
-                Trinity::AnyPlayerInObjectRangeCheck checker(me, 30);
+                Trinity::AnyPlayerInObjectRangeCheck checker(me, 30, true);
                 Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
                 me->VisitNearbyWorldObject(30, searcher);
                 if (!players.empty())
@@ -607,7 +607,7 @@ public:
             if (StormTimer <= uiDiff)
             {
                 std::list<Player*> players;
-                Trinity::AnyPlayerInObjectRangeCheck checker(me, 30);
+                Trinity::AnyPlayerInObjectRangeCheck checker(me, 30, true);
                 Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
                 me->VisitNearbyWorldObject(30, searcher);
                 if (!players.empty())
