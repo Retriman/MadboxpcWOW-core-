@@ -1,5 +1,5 @@
 -- Disables.
-DELETE FROM `disables` WHERE `entry` IN (10,11,30,603,631,249,658,668,649,650,724,632,624,616,11129,53260,53256,53259);
+DELETE FROM `disables` WHERE `entry` IN (10,11,30,603,631,249,658,668,649,650,724,632,624,616,53260,53256,53259);
 INSERT INTO `disables` (`sourceType`, `entry`, `flags`, `comment`) VALUES
 (3, 10, 0, 'Dalaran Sewers'),
 (3, 11, 0, 'The Ring of Valor'),
@@ -14,7 +14,6 @@ INSERT INTO `disables` (`sourceType`, `entry`, `flags`, `comment`) VALUES
 (2, 632, 3, 'Forge of Souls'),
 (2, 624, 3, 'Vault of Archavon'),
 (2, 616, 2, 'The Eye of Eternity Heroic'),
-(0, 11129, 1, 'Combustion Disable hasta fixear Cargas.'),
 (0, 53260, 1, 'Cobra Strikes Rank 3 - Fixear Mele hit sobre owner.'),
 (0, 53256, 1, 'Cobra Strikes Rank 1 - Fixear Mele hit sobre owner.'),
 (0, 53259, 1, 'Cobra Strikes Rank 2 - Fixear Mele hit sobre owner.');
