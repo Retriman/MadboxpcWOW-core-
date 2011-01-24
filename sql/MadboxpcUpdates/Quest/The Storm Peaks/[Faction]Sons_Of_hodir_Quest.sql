@@ -281,3 +281,8 @@ DELETE FROM `creature_ai_scripts` WHERE `creature_id` = 30366;
 INSERT INTO `creature_ai_scripts` (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
 VALUES
 ('3036601','30366','1','0','100','0','5000','10000','0','0','12','30340','0','120000','41','1000','0','0','0','0','0','0','Lure Jormuttar');
+
+-- Fix Quest http://www.wowhead.com/quest=13061  Prepare for Glory Spawn Npc faltante
+DELETE FROM `creature` WHERE `id` = 29975
+INSERT INTO `creature` (`id`, `map`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`) VALUES
+(29975, 571, 1, 1, 0, 0, 6925.96, -1533.25, 836.426, 4.56475, 300, 0, 0, 12175, 0, 0, 0, 0, 0, 0);
