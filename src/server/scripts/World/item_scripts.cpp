@@ -531,11 +531,11 @@ class item_green_rocket_cluster : public ItemScript
 public:
     item_green_rocket_cluster() : ItemScript("item_green_rocket_cluster") { }
 
-    if (!pPlayer)
-        return true;
-
     bool OnUse(Player* pPlayer, Item* pItem, SpellCastTargets const& /*targets*/)
     {
+        if (!pPlayer)
+            return true;
+
         if (pPlayer->GetAreaId() == STORMRAGE_BARROW_DENS_AREA)
         {
             if (Creature* pCreature = pPlayer->FindNearestCreature(BOSS_OMEN, 100, true))

@@ -297,7 +297,7 @@ public:
             if(m_pInstance)
             {
                 m_pInstance->SetData(TYPE_MALYGOS, NOT_STARTED);
-            }
+            } 
             else
             {
                 me->ForcedDespawn();
@@ -353,7 +353,7 @@ public:
             DespawnCreatures(NPC_SCION_OF_ETERNITY, 300.0f);
             DespawnCreatures(NPC_HOVER_DISC, 300.0f, true);
             DespawnCreatures(NPC_STATIC_FIELD, 300.0f);
-        }
+        }        
 
         void MoveInLineOfSight(Unit* who)
         {
@@ -578,7 +578,8 @@ public:
                    DoCast(pTrigger, uiSpellId, triggered);
                }
             }      
-        }     
+        } 
+
         void DoVortex(uint8 phase)
         {
             if(phase == 0)
@@ -671,9 +672,8 @@ public:
                     itr->getSource()->SetUInt64Value(PLAYER_FARSIGHT, 0);
                     itr->getSource()->NearTeleportTo(VortexLoc[0].x, VortexLoc[0].y, FALL_FROM_Z, 0);
                 }
-
                 MoveFly(false);
-            }
+            }   
         }
 
         void PowerSpark(uint8 action)
@@ -1279,7 +1279,7 @@ public:
                     else
                     {
                         m_uiTimer -= uiDiff;
-                    
+                    }
                     return;
                 }
                 else if(m_uiSubPhase == SUBPHASE_DESTROY_PLATFORM2)
@@ -1548,108 +1548,108 @@ public:
 /* mob_power_spark */
 class mob_power_spark : public CreatureScript
 {
-    public:
-        mob_power_spark() : CreatureScript("mob_power_spark") { }
+public:
+    mob_power_spark() : CreatureScript("mob_power_spark") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new mob_power_sparkAI (pCreature);  
+    }
+
+    struct mob_power_sparkAI : public ScriptedAI
+    {
+        mob_power_sparkAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            return new mob_power_sparkAI (pCreature);
+            m_pInstance = (InstanceScript*)pCreature->GetInstanceScript();
+            Reset();
         }
 
-        struct mob_power_sparkAI : public ScriptedAI
+        InstanceScript* m_pInstance;
+        bool isDead;
+        uint32 m_uiCheckTimer;
+        uint64 pMalygosGUID;
+
+        void Reset()
         {
-            mob_power_sparkAI(Creature* pCreature) : ScriptedAI(pCreature)
+            isDead = false;
+
+            Creature* pMalygos = GetClosestCreatureWithEntry(me, NPC_MALYGOS, 200.0f);
+            if(pMalygos)
             {
-                m_pInstance = (InstanceScript*)pCreature->GetInstanceScript();
-                Reset();
+                pMalygosGUID = pMalygos->GetGUID();
+                me->AddThreat(pMalygos, 10000000.0f);
+                me->Attack(pMalygos, true);
+                AttackStart(pMalygos);
             }
-     
-            InstanceScript* m_pInstance;
-            bool isDead;
-            uint32 m_uiCheckTimer;
-            uint64 pMalygosGUID;
-     
-            void Reset()
+            else
             {
-                isDead = false;
-
-                Creature* pMalygos = GetClosestCreatureWithEntry(me, NPC_MALYGOS, 200.0f);
-                if(pMalygos)
-                {
-                    pMalygosGUID = pMalygos->GetGUID();
-                    me->AddThreat(pMalygos, 10000000.0f);
-                    me->Attack(pMalygos, true);
-                    AttackStart(pMalygos);
-                }
-                else
-                {
-                    pMalygosGUID = 0;
-                }
-
-                m_uiCheckTimer = 2500;
-                me->SetSpeed(MOVE_WALK, 1.0f);
-                me->SetSpeed(MOVE_RUN, 1.0f);
-                WorldPacket heart;
-                me->BuildHeartBeatMsg(&heart);
-                me->SendMessageToSet(&heart, false);
+                pMalygosGUID = 0;
             }
 
-            void MoveInLineOfSight(Unit* pWho) {}
-            void EnterCombat(Unit* pWho) {}
+            m_uiCheckTimer = 2500;
+            me->SetSpeed(MOVE_WALK, 1.0f);
+            me->SetSpeed(MOVE_RUN, 1.0f);
+            WorldPacket heart;
+            me->BuildHeartBeatMsg(&heart);
+            me->SendMessageToSet(&heart, false);
+        }
 
-            void DamageTaken(Unit* pDoneBy, uint32 &uiDamage)
+        void MoveInLineOfSight(Unit* pWho) { }
+        void EnterCombat(Unit* pWho) { }
+
+        void DamageTaken(Unit* pDoneBy, uint32 &uiDamage)
+        {
+            if (isDead)    
             {
-                if (isDead)
-                {
-                    uiDamage = 0;
-                    return;
-                }
-     
-                if (uiDamage > me->GetHealth())
-                {
-                    isDead = true;
-     
-                    if (me->IsNonMeleeSpellCasted(false))
-                        me->InterruptNonMeleeSpells(false);
-     
-                    me->RemoveAllAuras();
-                    me->AttackStop();
-                    SetCombatMovement(false);
-     
-                    if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
-                        me->GetMotionMaster()->MovementExpired();
-     
-                    uiDamage = 0;
-                    m_uiCheckTimer = 250;
-                    //me->setFaction(35);
-                    me->SetHealth(1);
-                    me->AddAura(SPELL_POWER_SPARK_PLAYERS, me);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->ForcedDespawn(60000);
-                }
+                uiDamage = 0;
+                return;
             }
 
-            void EnergizePlayers()
+            if (uiDamage > me->GetHealth())
             {
-                Map* pMap = me->GetMap();
-                if(!pMap)
-                {
-                    return;
-                }
+                isDead = true;
 
-                Map::PlayerList const &lPlayers = pMap->GetPlayers();
-                for(Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-                {
-                    if(!itr->getSource()->isAlive())
+                if (me->IsNonMeleeSpellCasted(false))
+                    me->InterruptNonMeleeSpells(false);
+
+                me->RemoveAllAuras();
+                me->AttackStop();
+                SetCombatMovement(false);
+
+                if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
+                    me->GetMotionMaster()->MovementExpired();
+
+                uiDamage = 0;
+                m_uiCheckTimer = 250;
+                //me->setFaction(35);
+                me->SetHealth(1);
+                me->AddAura(SPELL_POWER_SPARK_PLAYERS, me);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->ForcedDespawn(60000);
+            }
+        }
+        
+        void EnergizePlayers()
+        {
+            Map* pMap = me->GetMap();
+            if(!pMap)
+            {
+                return;
+            }
+
+            Map::PlayerList const &lPlayers = pMap->GetPlayers();
+            for(Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+            {
+                if(!itr->getSource()->isAlive())
                     continue;
 
-                    if(itr->getSource()->IsWithinDist2d(me->GetPositionX(), me->GetPositionY(), 15.0f) && !itr->getSource()->HasAura(55849))
-                    {
-                        me->AddAura(55849, itr->getSource());
-                    }
+                if(itr->getSource()->IsWithinDist2d(me->GetPositionX(), me->GetPositionY(), 15.0f) && !itr->getSource()->HasAura(55849))
+                {
+                    me->AddAura(55849, itr->getSource());
                 }
-            }    
-
+            }
+        }    
+        
         void UpdateAI(const uint32 uiDiff)
         {
             if(isDead)
@@ -1689,338 +1689,336 @@ class mob_power_spark : public CreatureScript
                     }
                 }
                 m_uiCheckTimer = 2000;
-            }else m_uiCheckTimer -= uiDiff;
-        }
-        };
+            } else m_uiCheckTimer -= uiDiff;
+        }    
+    };
 };
 
 /* mob_scion_of_eternity */
 class mob_scion_of_eternity : public CreatureScript
 {
-    public:
-        mob_scion_of_eternity() : CreatureScript("mob_scion_of_eternity") { }
+public:
+    mob_scion_of_eternity() : CreatureScript("mob_scion_of_eternity") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new mob_scion_of_eternityAI (pCreature);
+    }
+
+    struct mob_scion_of_eternityAI : public ScriptedAI
+    {
+        mob_scion_of_eternityAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            return new mob_scion_of_eternityAI (pCreature);
+            m_pInstance = (InstanceScript*)pCreature->GetInstanceScript();
+            Reset();
+            m_uiIs10Man = RAID_MODE(true, false);
         }
 
-        struct mob_scion_of_eternityAI : public ScriptedAI
+        bool m_uiIs10Man;
+
+        InstanceScript* m_pInstance;
+        uint32 m_uiArcaneBarrageTimer;
+        uint32 m_uiMoveTimer;
+        uint8 m_uiMovePoint; 
+
+        void Reset()
         {
-            mob_scion_of_eternityAI(Creature* pCreature) : ScriptedAI(pCreature)
-            {
-                m_pInstance = (InstanceScript*)pCreature->GetInstanceScript();
-                Reset();
-                m_uiIs10Man = RAID_MODE(true, false);
-            }
-        
-            bool m_uiIs10Man;
+            me->SetFlying(true);
+            me->SetSpeed(MOVE_WALK, 0.7f, true);
+            me->SetSpeed(MOVE_RUN, 0.7f, true);
+            me->SetSpeed(MOVE_FLIGHT, 0.7f, true);
+            DoNextMovement();
+            m_uiMovePoint = 0;
+            m_uiMoveTimer = 10000;   
+            m_uiArcaneBarrageTimer = 5000 + rand()%15000;
+            me->SetInCombatWithZone();
+        }
 
-            InstanceScript* m_pInstance;
-            uint32 m_uiArcaneBarrageTimer;
-            uint32 m_uiMoveTimer;
-            uint8 m_uiMovePoint;
-     
-            void Reset()
+        void AttackStart(Unit *pWho)
+        {
+            if(pWho->GetTypeId() != TYPEID_PLAYER)
+                return;
+
+            if (me->Attack(pWho, true))
             {
-                me->SetFlying(true);
-                me->SetSpeed(MOVE_WALK, 0.7f, true);
-                me->SetSpeed(MOVE_RUN, 0.7f, true);
-                me->SetSpeed(MOVE_FLIGHT, 0.7f, true);
+                me->AddThreat(pWho, 1.0f);
+                me->SetInCombatWith(pWho);
+                pWho->SetInCombatWith(me);
+                me->GetMotionMaster()->MoveChase(pWho, 15.0f);
+            }
+        }
+
+        void DoNextMovement()
+        {
+            WorldPacket heart;
+            me->BuildHeartBeatMsg(&heart);
+            me->SendMessageToSet(&heart, false);
+            m_uiMovePoint++;
+            float x = (float)urand(SHELL_MIN_X, SHELL_MAX_X);               
+            float y = (float)urand(SHELL_MIN_Y, SHELL_MAX_Y);
+            me->GetMotionMaster()->MovePoint(m_uiMovePoint, x, y, FLOOR_Z+10);
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(!UpdateVictim())
+            {
+                return;
+            }
+
+            if(m_uiArcaneBarrageTimer <= uiDiff)
+            {
+                if(Unit* pTarget = SelectUnit(SELECT_TARGET_RANDOM, 0))
+                {
+                    if(pTarget->GetVehicle())
+                    {
+                        return;
+                    }
+
+                    int32 bpoints0 = RAID_MODE(int32(BP_BARRAGE0), int32(BP_BARRAGE0_H));
+                    me->CastCustomSpell(pTarget, m_uiIs10Man ? SPELL_ARCANE_SHOCK : SPELL_ARCANE_SHOCK_H, &bpoints0, 0, 0, false);
+                    DoCast(pTarget, SPELL_ARCANE_BARRAGE);  
+                }
+
+                m_uiArcaneBarrageTimer = 3000 + rand()%7000;
                 DoNextMovement();
-                m_uiMovePoint = 0;
+            }
+            else
+            {
+                m_uiArcaneBarrageTimer -= uiDiff;
+            }
+
+            if(m_uiMoveTimer <= uiDiff)
+            {
+                if(m_pInstance->GetData(TYPE_MALYGOS) == NOT_STARTED)
+                {
+                    me->ForcedDespawn();
+                }
+
                 m_uiMoveTimer = 10000;
-                m_uiArcaneBarrageTimer = 5000 + rand()%15000;
-                me->SetInCombatWithZone();
+                DoNextMovement();
             }
-                        
-            void AttackStart(Unit *pWho)
+            else
             {
-                if(pWho->GetTypeId() != TYPEID_PLAYER)
-                    return;
-     
-                if (me->Attack(pWho, true))
-                {
-                    me->AddThreat(pWho, 1.0f);
-                    me->SetInCombatWith(pWho);
-                    pWho->SetInCombatWith(me);
-                    me->GetMotionMaster()->MoveChase(pWho, 15.0f);
-                }
+                m_uiMoveTimer -= uiDiff;
             }
-        
-            void DoNextMovement()
-            {
-                WorldPacket heart;
-                me->BuildHeartBeatMsg(&heart);
-                me->SendMessageToSet(&heart, false);
-                m_uiMovePoint++;
-                float x = (float)urand(SHELL_MIN_X, SHELL_MAX_X);
-                float y = (float)urand(SHELL_MIN_Y, SHELL_MAX_Y);
-                me->GetMotionMaster()->MovePoint(m_uiMovePoint, x, y, FLOOR_Z+10);
-            }
-
-            void UpdateAI(const uint32 uiDiff)
-            {
-                if(!UpdateVictim())
-                {
-                    return;
-                }
-            
-                if(m_uiArcaneBarrageTimer <= uiDiff)
-                {
-                    if(Unit* pTarget = SelectUnit(SELECT_TARGET_RANDOM, 0))
-                    {
-                        if(pTarget->GetVehicle())
-                        {
-                            return;
-                        }
-
-                        int32 bpoints0 = RAID_MODE(int32(BP_BARRAGE0), int32(BP_BARRAGE0_H));
-                        me->CastCustomSpell(pTarget, m_uiIs10Man ? SPELL_ARCANE_SHOCK : SPELL_ARCANE_SHOCK_H, &bpoints0, 0, 0, false);
-                        DoCast(pTarget, SPELL_ARCANE_BARRAGE);  
-                    }
-
-                    m_uiArcaneBarrageTimer = 3000 + rand()%7000;
-                    DoNextMovement();
-                }
-                else
-                {
-                    m_uiArcaneBarrageTimer -= uiDiff;
-                }
-             
-                if(m_uiMoveTimer <= uiDiff)
-                {
-                    if(m_pInstance->GetData(TYPE_MALYGOS) == NOT_STARTED)
-                    {
-                        me->ForcedDespawn();
-                    }
-
-                    m_uiMoveTimer = 10000;
-                    DoNextMovement();
-                }
-                else
-                {
-                    m_uiMoveTimer -= uiDiff;
-                }
-            }
-        };
+        }
+    };
 };
 
 /* npc_arcane_overload */
 class npc_arcane_overload : public CreatureScript
 {
-    public:
-        npc_arcane_overload() : CreatureScript("npc_arcane_overload") { }
+public:
+    npc_arcane_overload() : CreatureScript("npc_arcane_overload") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_arcane_overloadAI (pCreature);
+    }
+
+    struct npc_arcane_overloadAI : public ScriptedAI
+    {
+        npc_arcane_overloadAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            return new npc_arcane_overloadAI (pCreature);
+            m_pInstance = (InstanceScript*)pCreature->GetInstanceScript();
+            Reset();
         }
 
-        struct npc_arcane_overloadAI : public ScriptedAI
+        InstanceScript* m_pInstance;
+
+        uint32 m_uiProtectTimer;    
+        bool m_uiAOCasted;    
+        float range;
+                
+        void Reset()
         {
-            npc_arcane_overloadAI(Creature* pCreature) : ScriptedAI(pCreature)
+            m_uiProtectTimer = 1000;
+            m_uiAOCasted = false;
+            range = 45.0f;
+        }
+
+        void ProtectAllPlayersInRange(float range)
+        {
+            Map* pMap = me->GetMap();
+            if(!pMap)
             {
-                m_pInstance = (InstanceScript*)pCreature->GetInstanceScript();
-                Reset();
+                return;
             }
-        
-            InstanceScript* m_pInstance;
-        
-            uint32 m_uiProtectTimer;    
-            bool m_uiAOCasted;    
-            float range;
-        
-            void Reset()
+
+            // The range of the bubble is 12 yards, decreases to 0 yards, linearly, over time.
+            float realRange = (range / 45.0f) * 12.0f;
+
+            Map::PlayerList const &lPlayers = pMap->GetPlayers();
+            for(Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
             {
-                m_uiProtectTimer = 1000;
-                m_uiAOCasted = false;
-                range = 45.0f;
-            }
-        
-            void ProtectAllPlayersInRange(float range)
-            {
-                  Map* pMap = me->GetMap();
-                  if(!pMap)
-                  {
-                        return;
-                  }
+                if(!itr->getSource()->isAlive())
+                {
+                    continue;
+                }
 
-                  // The range of the bubble is 12 yards, decreases to 0 yards, linearly, over time.
-                  float realRange = (range / 45.0f) * 12.0f;
-          
-                  Map::PlayerList const &lPlayers = pMap->GetPlayers();
-                  for(Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-                  {
-                        if(!itr->getSource()->isAlive())
-                        {
-                            continue;
-                        }
-
-                        if(!itr->getSource()->IsWithinDist2d(me->GetPositionX(), me->GetPositionY(), realRange))
-                        {
-                            // Remove aura if is within 12 yards (So got the aura via it's default aura range)
-                            // but isn't in range of the shrunk bubble (So shouldn't get the aura, because it's range already decreased)
-                            if(itr->getSource()->IsWithinDist2d(me->GetPositionX(), me->GetPositionY(), 12))
-                            {
-                                itr->getSource()->RemoveAurasDueToSpell(SPELL_ARCANE_OVERLOAD_PROTECT);
-                            }
-                        }
-                        else 
-                        {
-                            if(!itr->getSource()->HasAura(SPELL_ARCANE_OVERLOAD_PROTECT))
-                            {
-                                // Add the aura if still within shrunk bubble range
-                                me->AddAura(SPELL_ARCANE_OVERLOAD_PROTECT, itr->getSource());
-                            }
-                            else
-                            {
-                                // Refresh aura duration
-                                Aura* aur = me->GetAura(SPELL_ARCANE_OVERLOAD_PROTECT);
-
-                                if(aur)
-                                {
-                                    aur->RefreshDuration();
-                                }
-                            }
-                        }
-                  }
-              }    
-        
-                void UpdateAI(const uint32 uiDiff)
-                {    
-                    if(!m_uiAOCasted)
+                if(!itr->getSource()->IsWithinDist2d(me->GetPositionX(), me->GetPositionY(), realRange))
+                {
+                    // Remove aura if is within 12 yards (So got the aura via it's default aura range)
+                                                // but isn't in range of the shrunk bubble (So shouldn't get the aura, because it's range already decreased)
+                    if(itr->getSource()->IsWithinDist2d(me->GetPositionX(), me->GetPositionY(), 12))
                     {
-                        DoCast(me,SPELL_ARCANE_OVERLOAD);
-                        m_uiAOCasted = true;
+                        itr->getSource()->RemoveAurasDueToSpell(SPELL_ARCANE_OVERLOAD_PROTECT);
                     }
-
-                    if(m_uiProtectTimer <= uiDiff)
+                }
+                else 
+                {
+                    if(!itr->getSource()->HasAura(SPELL_ARCANE_OVERLOAD_PROTECT))
                     {
-                        ProtectAllPlayersInRange(range);
-                        range -= 0.5f;
-                        m_uiProtectTimer = 250;
+                        // Add the aura if still within shrunk bubble range
+                        me->AddAura(SPELL_ARCANE_OVERLOAD_PROTECT, itr->getSource());
                     }
                     else
                     {
-                        m_uiProtectTimer -= uiDiff;
+                        // Refresh aura duration
+                        Aura* aur = me->GetAura(SPELL_ARCANE_OVERLOAD_PROTECT);
+
+                        if(aur)
+                        {
+                            aur->RefreshDuration();
+                        }
                     }
                 }
-        };
+            }
+        }    
+
+        void UpdateAI(const uint32 uiDiff)
+        {    
+            if(!m_uiAOCasted)
+            {
+                DoCast(me,SPELL_ARCANE_OVERLOAD);
+                m_uiAOCasted = true;
+            }
+            if(m_uiProtectTimer <= uiDiff)
+            {
+                ProtectAllPlayersInRange(range);
+                range -= 0.5f;
+                m_uiProtectTimer = 250;
+            }
+            else
+            {
+                m_uiProtectTimer -= uiDiff;
+            }
+        }
+    };
 };
 
 /* mob_nexus_lord */
 class mob_nexus_lord : public CreatureScript
 {
-    public:
-        mob_nexus_lord() : CreatureScript("mob_nexus_lord") { }
-
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new mob_nexus_lordAI (pCreature);
-        }
+public:
+    mob_nexus_lord() : CreatureScript("mob_nexus_lord") { }
     
-        struct mob_nexus_lordAI : public ScriptedAI
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new mob_nexus_lordAI (pCreature);
+    }
+    
+    struct mob_nexus_lordAI : public ScriptedAI
+    {
+        mob_nexus_lordAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            mob_nexus_lordAI(Creature* pCreature) : ScriptedAI(pCreature)
-            {
-                m_pInstance = (InstanceScript*)pCreature->GetInstanceScript();
-                Reset();
-                m_uiIs10Man = RAID_MODE(true, false);
+            m_pInstance = (InstanceScript*)pCreature->GetInstanceScript();
+            Reset();
+            m_uiIs10Man = RAID_MODE(true, false);
+        }
+
+        InstanceScript* m_pInstance;
+
+        bool m_uiIs10Man;
+
+        uint32 m_uiArcaneShockTimer;
+        uint32 m_uiHasteTimer;
+        uint32 attackNow;  
+
+        void Reset()
+        {
+            me->SetSpeed(MOVE_WALK, 0.7f, true);
+            me->SetSpeed(MOVE_RUN, 0.7f, true);
+            me->SetSpeed(MOVE_FLIGHT, 0.7f, true);
+            m_uiHasteTimer = 20000;
+            m_uiArcaneShockTimer = 5000 + rand()%15000;
+            attackNow = 4000;
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {        
+            if (!UpdateVictim())
+            {           
+                return;
             }
-        
-            InstanceScript* m_pInstance;
-        
-            bool m_uiIs10Man;
-        
-            uint32 m_uiArcaneShockTimer;
-            uint32 m_uiHasteTimer;
-            uint32 attackNow;
-     
-            void Reset()
+            if(m_pInstance->GetData(TYPE_MALYGOS) == NOT_STARTED)
             {
-                me->SetSpeed(MOVE_WALK, 0.7f, true);
-                me->SetSpeed(MOVE_RUN, 0.7f, true);
-                me->SetSpeed(MOVE_FLIGHT, 0.7f, true);
-                m_uiHasteTimer = 20000;
-                m_uiArcaneShockTimer = 5000 + rand()%15000;
-                attackNow = 4000;
+                me->ForcedDespawn();
             }
 
-            void UpdateAI(const uint32 uiDiff)
-            {        
-                if (!UpdateVictim())
+            if(m_uiArcaneShockTimer <= uiDiff)
+            {
+                if (Unit* pTarget = SelectUnit(SELECT_TARGET_RANDOM, 0))
                 {
-                    return;
+                    DoCast(pTarget, m_uiIs10Man ? SPELL_ARCANE_SHOCK : SPELL_ARCANE_SHOCK_H);
                 }
 
-                if(m_pInstance->GetData(TYPE_MALYGOS) == NOT_STARTED)
-                {
-                    me->ForcedDespawn();
-                }
-            
-                if(m_uiArcaneShockTimer <= uiDiff)
-                {
-                    if (Unit* pTarget = SelectUnit(SELECT_TARGET_RANDOM, 0))
-                    {
-                        DoCast(pTarget, m_uiIs10Man ? SPELL_ARCANE_SHOCK : SPELL_ARCANE_SHOCK_H);
-                    }
+                m_uiArcaneShockTimer = 3000 + rand()%19000;
+            }
+            else
+            {
+                m_uiArcaneShockTimer -= uiDiff;
+            }
 
-                    m_uiArcaneShockTimer = 3000 + rand()%19000;
+            if(m_uiHasteTimer <= uiDiff)
+            {
+                DoCast(me, SPELL_HASTE);
+                m_uiHasteTimer = 10000 + rand()%10000;
+            }
+            else
+            {
+                m_uiHasteTimer -= uiDiff;
+            }
+
+            if(attackNow)
+            {
+                if(attackNow < uiDiff)
+                {
+                    attackNow = 0;
                 }
                 else
                 {
-                    m_uiArcaneShockTimer -= uiDiff;
+                    attackNow -= uiDiff;
                 }
-            
-                if(m_uiHasteTimer <= uiDiff)
-                {
-                    DoCast(me, SPELL_HASTE);
-                    m_uiHasteTimer = 10000 + rand()%10000;
-                }
-                else
-                {
-                    m_uiHasteTimer -= uiDiff;
-                }
+            }
 
-                if(attackNow)
-                {
-                    if(attackNow < uiDiff)
-                    {
-                        attackNow = 0;
-                    }
-                    else
-                    {
-                        attackNow -= uiDiff;
-                    }
-                }
-
-                if(!attackNow)
-                {
-                    DoMeleeAttackIfReady();
-                }
-                        }
-        };
+            if(!attackNow)
+            {
+                DoMeleeAttackIfReady();
+            }
+        }
+    };
 };
 
 class go_malygos_iris : public GameObjectScript
 {
-    public:
-         go_malygos_iris() : GameObjectScript("go_malygos_iris") { }
+public:
+    go_malygos_iris() : GameObjectScript("go_malygos_iris") { }
 
-         bool OnGossipHello(Player *pPlayer, GameObject * pGO)
-         {
-              if (Creature *malygos = pGO->FindNearestCreature(NPC_MALYGOS, 300.0f, true))
-              {
-                  if (malygos->AI())
-                  {
-                      malygos->AI()->DoAction(0);
-                      pGO->CastSpell(NULL, 61012);
-                      pGO->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_DESTROYED);
-                  }
-              }
+    bool OnGossipHello(Player *pPlayer, GameObject * pGO)
+    {
+        if (Creature *malygos = pGO->FindNearestCreature(NPC_MALYGOS, 300.0f, true))
+        {
+            if (malygos->AI())
+            {
+                malygos->AI()->DoAction(0);
+                pGO->CastSpell(NULL, 61012);
+                pGO->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_DESTROYED);
+            }
+        }
         return true;
-        } 
+    } 
 };
 
 void AddSC_boss_malygos()

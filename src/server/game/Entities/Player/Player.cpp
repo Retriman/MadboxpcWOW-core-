@@ -20930,7 +20930,7 @@ void Player::InitPrimaryProfessions()
                 {
                     SetSkill(skill_id,0 , 0, 0);
                     sLog->outError("Player %s has more than two professions. Skill %u removed",GetName(),skill_id);
-                    sWorld->BanAccount(BAN_CHARACTER, GetName(), "60d" , "No es bueno tener mas profesiones:P", "Server-anticheat")
+                    sWorld->BanAccount(BAN_CHARACTER, GetName(), "60d" , "No es bueno tener mas profesiones:P", "Server-anticheat");
                 }
             }
         }
