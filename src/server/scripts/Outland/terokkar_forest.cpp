@@ -1093,10 +1093,15 @@ public:
 
         void WaypointReached(uint32 uiPointId)
         {
+            Player* pPlayer = GetPlayerForEscort();
+
+            if (!pPlayer)
+                return;
+
             switch(uiPointId)
             {
                 case 0:
-                    if (Player* pPlayer = GetPlayerForEscort())
+                    if (pPlayer)
                         DoScriptText(SAY_LE_KEEP_SAFE, me, pPlayer);
                     break;
                 case 1:
@@ -1110,6 +1115,12 @@ public:
                     SetEscortPaused(true);
                     break;
                 case 13:
+                    DoScriptText(EMOTE_LE_PICK_UP, me);
+                    if (pPlayer) 
+                    {
+                        DoScriptText(SAY_LE_THANKS, me, pPlayer);
+                        pPlayer->GroupEventHappens(QUEST_DIGGING_BONES, me);
+                    }
                     SetRun();
                     break;
             }
@@ -1191,14 +1202,6 @@ public:
                                 me->SummonCreature(NPC_BONE_SIFTER, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
                                 break;
                             case 13:
-                                DoScriptText(EMOTE_LE_PICK_UP, me);
-
-                                if (Player* pPlayer = GetPlayerForEscort())
-                                {
-                                    DoScriptText(SAY_LE_THANKS, me, pPlayer);
-                                    pPlayer->GroupEventHappens(QUEST_DIGGING_BONES, me);
-                                }
-
                                 SetEscortPaused(false);
                                 break;
                         }
