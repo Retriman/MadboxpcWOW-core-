@@ -2914,6 +2914,16 @@ bool ChatHandler::HandleBanCharacterCommand(const char *args)
             break;
     }
 
+    std::string BanAnnounce;
+
+    BanAnnounce = "Personaje: '";
+    BanAnnounce += name.c_str();
+    BanAnnounce += "' Fue baneado por ";
+    BanAnnounce += duration;
+    BanAnnounce += ". La razon es: ";
+    BanAnnounce += reason;
+    HandleAnnounceCommand(BanAnnounce.c_str());
+
     return true;
 }
 
