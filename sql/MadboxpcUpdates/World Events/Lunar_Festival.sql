@@ -56,4 +56,4 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 -- Remove useless quests: (as of patch 3.0 they where removed)
 DELETE FROM `creature_questrelation` WHERE `quest` IN (8876,8877,8878,8879,8880,8881,8882,8862,8863,8864,8865);
 
-
+UPDATE `game_event` SET `start_time` = '2011-01-23 00:01:00' WHERE `entry`=7; -- Lunar Festival
