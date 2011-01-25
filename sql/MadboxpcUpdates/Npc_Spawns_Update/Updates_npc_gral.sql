@@ -1,0 +1,2 @@
+-- Update Grals Npcs.
+UPDATE  `creature_template` SET  `unit_flags` =  '0' WHERE  `entry` =22441;-- Teribus the Cursed http://www.wowhead.com/npc=22441 Atacable ([Quest] Evil Draws Near - 10923) Close #93 
