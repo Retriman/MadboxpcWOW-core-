@@ -253,4 +253,7 @@ INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`,`ap_bonus`,
 (48561,0,0,0.063,0,'Druid - Swipe (Bear) Rank 7'),
 (48562,0,0,0.063,0,'Druid - Swipe (Bear) Rank 8');
 
+-- 25_01_2010_world_spell_bonus_data.sql
+-- Fix Exploit Explosive Shot (aumentava con el Sp cosa que no debe ser).
+UPDATE `spell_bonus_data` SET  `direct_bonus` =  '0',`dot_bonus` =  '0',`ap_dot_bonus` =  '0' WHERE `entry` =53352;
 
