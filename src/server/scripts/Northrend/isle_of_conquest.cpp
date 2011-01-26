@@ -158,14 +158,14 @@ public:
                 if (me->GetEntry()== NPC_OVERLORD_AGMAR && (x > 1348 || x < 1283 || y < -800 || y > -730))
                 {
                     me->Kill(me->getVictim());
-                    me->MonsterSay("Antibugers:No querias bugear rqlo :)", LANG_UNIVERSAL, NULL);
+                    me->MonsterSay("Antibugers:$N, No querias bugear rqlo :)", LANG_UNIVERSAL, me->GetGUID());
                     EnterEvadeMode();
                 }
 
                 if (me->GetEntry()== NPC_HIGH_COMMANDER_HALFORD_WYRMBANE && (x > 288 || x < 216 || y < -863 || y > -800))
                 {
                     EnterEvadeMode();
-                    me->MonsterSay("Antibugers:No querias bugear rqlo :)", LANG_UNIVERSAL, NULL);
+                    me->MonsterSay("Antibugers:$N, No querias bugear rqlo :)", LANG_UNIVERSAL, me->GetGUID());
                     me->Kill(me->getVictim());
                 }
                 uiResetTimer = 200;
