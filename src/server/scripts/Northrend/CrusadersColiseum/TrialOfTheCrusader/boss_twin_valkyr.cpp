@@ -156,7 +156,7 @@ struct boss_twin_baseAI : public ScriptedAI
         m_uiColorballsTimer = 15*IN_MILLISECONDS;
         m_uiSpecialAbilityTimer = MINUTE*IN_MILLISECONDS;
         m_uiSpikeTimer = 20*IN_MILLISECONDS;
-        m_uiTouchTimer = urand(10, 15)*IN_MILLISECONDS;
+        m_uiTouchTimer = 20*IN_MILLISECONDS;
         m_uiBerserkTimer = IsHeroic() ? 6*MINUTE*IN_MILLISECONDS : 10*MINUTE*IN_MILLISECONDS;
 
         Summons.DespawnAll();
@@ -245,13 +245,15 @@ struct boss_twin_baseAI : public ScriptedAI
 
         if (pDoneBy->GetTypeId() == TYPEID_PLAYER)
         {
-            if (pDoneBy->HasAura(m_uiOtherEssenceSpellId))
-                uiDamage += uiDamage/2;
+            float mod = 1.0f;
             if (pDoneBy->HasAura(m_uiEmpoweredWeaknessSpellId))
-                uiDamage += uiDamage;
+                mod += 1.0f;
+            if (pDoneBy->HasAura(m_uiOtherEssenceSpellId))
+                mod += 0.5f;
             else
                 if (pDoneBy->HasAura(m_uiMyEssenceSpellId))
-                    uiDamage /= 2;
+                    mod -= 0.5f;
+            uiDamage *= mod;
         }
 
         if (m_pInstance)
@@ -395,11 +397,25 @@ struct boss_twin_baseAI : public ScriptedAI
         if (IsHeroic() && m_uiTouchTimer <= uiDiff)
         {
             if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 200, true, m_uiOtherEssenceSpellId))
-                me->CastCustomSpell(m_uiTouchSpellId, SPELLVALUE_MAX_TARGETS, 1, pTarget, false);
-            m_uiTouchTimer = urand(10, 15)*IN_MILLISECONDS;
+                if (pTarget->isAlive()) 
+                {
+                    me->AddAura(m_uiTouchSpellId,pTarget);    
+                    m_uiTouchTimer = 20*IN_MILLISECONDS;
+                }
+                else
+                    m_uiTouchTimer = 0;
+            else
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0,200,true))
+                    if (pTarget->isAlive() && !pTarget->HasAura(m_uiMyEssenceSpellId)) 
+                    {
+                        me->AddAura(m_uiTouchSpellId,pTarget);  
+                        m_uiTouchTimer = 20*IN_MILLISECONDS;
+                    }
+                    else
+                        m_uiTouchTimer = 0;
         }
         else
-            m_uiTouchTimer -= uiDiff;
+            m_uiTouchTimer -= uiDiff;               
 
         if (m_uiColorballsTimer <= uiDiff)
         {
@@ -544,14 +560,23 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
+        if (!player)
+            return true;
+
         switch (creature->GetEntry())
         {
             case NPC_LIGHT_ESSENCE:
-                player->RemoveAura(SPELL_DARK_ESSENCE);
+                if (player->HasAura(SPELL_DARK_ESSENCE))
+                    player->RemoveAura(SPELL_DARK_ESSENCE);
+                if (player->HasAura(SPELL_LIGHT_TOUCH))
+                    player->RemoveAura(SPELL_LIGHT_TOUCH);
                 player->CastSpell(player, SPELL_LIGHT_ESSENCE, true);
                 break;
             case NPC_DARK_ESSENCE:
-                player->RemoveAura(SPELL_LIGHT_ESSENCE);
+                if (player->HasAura(SPELL_LIGHT_ESSENCE))
+                    player->RemoveAura(SPELL_LIGHT_ESSENCE);
+                if (player->HasAura(SPELL_DARK_TOUCH))
+                    player->RemoveAura(SPELL_DARK_TOUCH);
                 player->CastSpell(player, SPELL_DARK_ESSENCE, true);
                 break;
             default:
