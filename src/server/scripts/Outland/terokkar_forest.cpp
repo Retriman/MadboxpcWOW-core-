@@ -1224,7 +1224,7 @@ enum eCaptive
     GO_VEIL_SKITH_CAGE        = 185202,
     GO_VEIL_SKITH_CAGE2       = 185203,
     GO_VEIL_SKITH_CAGE3       = 185204,
-    GO_VEIL_SKITH_CAGE4       = 185205,
+    GO_VEIL_SKITH_CAGE4       = 185205
 };
 
 class npc_captive_child : public CreatureScript
@@ -1241,24 +1241,30 @@ public:
         void Reset()
         {
             FleeTimer = 0;
-            if(GameObject *cage = me->FindNearestGameObject(GO_VEIL_SKITH_CAGE, 5.0f))
+            if (GameObject *cage = me->FindNearestGameObject(GO_VEIL_SKITH_CAGE, 5.0f))
             {
-                if(cage)
+                if (cage)
                     cage->ResetDoorOrButton(); 
-            }else{
-                if(GameObject *cage = me->FindNearestGameObject(GO_VEIL_SKITH_CAGE2, 5.0f))
+            }
+            else
+            {
+                if (GameObject *cage = me->FindNearestGameObject(GO_VEIL_SKITH_CAGE2, 5.0f))
                 {
-                    if(cage)
+                    if (cage)
                         cage->ResetDoorOrButton();
-                }else{
-                    if(GameObject *cage = me->FindNearestGameObject(GO_VEIL_SKITH_CAGE3, 5.0f))
+                }
+                else
+                {
+                    if (GameObject *cage = me->FindNearestGameObject(GO_VEIL_SKITH_CAGE3, 5.0f))
                     {
-                        if(cage)
+                        if (cage)
                             cage->ResetDoorOrButton();
-                    }else{
-                        if(GameObject *cage = me->FindNearestGameObject(GO_VEIL_SKITH_CAGE4, 5.0f))
+                    }
+                    else
+                    {
+                        if (GameObject *cage = me->FindNearestGameObject(GO_VEIL_SKITH_CAGE4, 5.0f))
                         {
-                            if(cage)
+                            if (cage)
                                 cage->ResetDoorOrButton();
                         }
                     }
@@ -1268,9 +1274,9 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-            if(FleeTimer)
+            if (FleeTimer)
             {
-                if(FleeTimer <= uiDiff)
+                if (FleeTimer <= uiDiff)
                     me->ForcedDespawn();
                 else 
                     FleeTimer -= uiDiff;
@@ -1305,23 +1311,29 @@ public:
         {
             std::list<Creature*> lChildrenList;
             GetCreatureListWithEntryInGrid(lChildrenList, pGO, NPC_CAPTIVE_CHILD, INTERACTION_DISTANCE);
-            for(std::list<Creature*>::const_iterator itr = lChildrenList.begin(); itr != lChildrenList.end(); ++itr)
+            for (std::list<Creature*>::const_iterator itr = lChildrenList.begin(); itr != lChildrenList.end(); ++itr)
             {
                 pPlayer->KilledMonsterCredit(NPC_CAPTIVE_CHILD, (*itr)->GetGUID());
                 (*itr)->GetMotionMaster()->MoveFleeing(pPlayer, 3500);
-                CAST_AI(npc_captive_child::npc_captive_childAI, (*itr)->AI())->FleeTimer = 3500;;
-                switch(urand(0,3))
+                CAST_AI(npc_captive_child::npc_captive_childAI, (*itr)->AI())->FleeTimer = 3500;;                
+                switch (urand(0,3))
                 {
-                    case 0: DoScriptText(SAY_THANKS_1, *itr); break;
-                    case 1: DoScriptText(SAY_THANKS_2, *itr); break;
-                    case 2: DoScriptText(SAY_THANKS_3, *itr); break;
-                    case 3: DoScriptText(SAY_THANKS_4, *itr); break;
+                    case 0: 
+                        DoScriptText(SAY_THANKS_1, *itr);
+                        break;
+                    case 1: 
+                        DoScriptText(SAY_THANKS_2, *itr);
+                        break;
+                    case 2: 
+                        DoScriptText(SAY_THANKS_3, *itr); 
+                        break;
+                    case 3: 
+                        DoScriptText(SAY_THANKS_4, *itr);
+                        break;
                 }
-
                 (*itr)->GetMotionMaster()->Clear();
             }
-        }    
-       
+        }     
         return false;
     }
 };
