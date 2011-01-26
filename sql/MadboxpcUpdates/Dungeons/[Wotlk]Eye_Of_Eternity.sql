@@ -21,6 +21,11 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_arcane_overload' WHERE `entry
 
 -- Script GO Focusing Iris
 UPDATE `gameobject_template` SET `ScriptName` = 'go_malygos_iris' WHERE `entry` IN (193960,193958); 
+-- Spawn 193960 (GO) 10 Normal.
+DELETE FROM `gameobject` WHERE `id` =193960;
+INSERT INTO `gameobject` (`id`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`) 
+VALUES
+('193960','616','1','1','757.967','1298.58','266.171','5.49129','0','0','0.385681','-0.922632','300','0','1');
 
 -- Fix Wyrmrest drakes creature info
 UPDATE `creature_template` SET `spell1` = 56091, `spell2` = 56092, `spell3` = 57090, `spell4` = 57143, `spell5` = 57108, `spell6` = 57403, `VehicleId` = 165 WHERE entry IN (30161, 31752);
