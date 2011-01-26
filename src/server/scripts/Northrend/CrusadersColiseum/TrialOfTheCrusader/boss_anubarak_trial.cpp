@@ -92,6 +92,9 @@ enum BossSpells
     //Frost Sphere
     SPELL_FROST_SPHERE      = 67539,
     SPELL_PERMAFROST        = 66193,
+    SPELL_PERMAFROST_25     = 67855,
+    SPELL_PERMAFROST_10H    = 67856,
+    SPELL_PERMAFROST_25H    = 67857,
     SPELL_PERMAFROST_VISUAL = 65882,
 
     //Spike
@@ -178,7 +181,7 @@ public:
             m_bIntro = true;
             m_bReachedPhase3 = false;
             m_uiTargetGUID = 0;
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             Summons.DespawnAll();
             m_vBurrowGUID.clear();
         }
@@ -268,7 +271,7 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-            if (!UpdateVictim())
+            if (!UpdateVictim() || me->HasUnitState(UNIT_STAT_CASTING))
                 return;
 
             switch (m_uiStage)
@@ -307,6 +310,8 @@ public:
                 case 1:
                     DoCast(me, SPELL_SUBMERGE_ANUBARAK);
                     DoCast(me, SPELL_CLEAR_ALL_DEBUFFS);
+                    me->ApplySpellImmune(0,IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
+                    me->ApplySpellImmune(0,IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     DoScriptText(SAY_BURROWER, me);
                     m_uiScarabSummoned = 0;
@@ -353,6 +358,8 @@ public:
                     m_uiStage = 0;
                     DoCast(SPELL_SPIKE_TELE);
                     Summons.DespawnEntry(NPC_SPIKE);
+                    me->ApplySpellImmune(0,IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, false);
+                    me->ApplySpellImmune(0,IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, false);
                     me->RemoveAurasDueToSpell(SPELL_SUBMERGE_ANUBARAK);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     DoCast(me, SPELL_EMERGE_ANUBARAK);
@@ -388,8 +395,9 @@ public:
 
             if (HealthBelowPct(30) && m_uiStage == 0 && !m_bReachedPhase3)
             {
+                me->InterruptNonMeleeSpells(false);
                 m_bReachedPhase3 = true;
-                DoCastAOE(SPELL_LEECHING_SWARM);
+                DoCastAOE(SPELL_LEECHING_SWARM, true);
                 DoScriptText(EMOTE_LEECHING_SWARM, me);
                 DoScriptText(SAY_LEECHING_SWARM, me);
             }
@@ -521,7 +529,7 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-            if (!UpdateVictim())
+            if (!UpdateVictim() || me->HasUnitState(UNIT_STAT_CASTING))
                 return;
 
             if ((m_uiSubmergeTimer <= uiDiff) && HealthBelowPct(80))
@@ -535,7 +543,10 @@ public:
                 }
                 else
                 {
-                    if (!me->HasAura(SPELL_PERMAFROST))
+                    if (!me->HasAura(SPELL_PERMAFROST)
+                        && !me->HasAura(SPELL_PERMAFROST_25)
+                        && !me->HasAura(SPELL_PERMAFROST_10H)
+                        && !me->HasAura(SPELL_PERMAFROST_25H))
                     {
                         DoCast(me, SPELL_SUBMERGE_EFFECT);
                         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_OOC_NOT_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
@@ -585,7 +596,7 @@ public:
 
         void DamageTaken(Unit* /*pWho*/, uint32& uiDamage)
         {
-            if (me->GetHealth() < uiDamage)
+            if (me->GetHealth() <= uiDamage)
             {
                 uiDamage = 0;
                 if (!m_bFall)
@@ -660,10 +671,12 @@ public:
             // For an unknown reason this npc isn't recognize the Aura of Permafrost with this flags =/
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_OOC_NOT_ATTACKABLE);
             m_uiTargetGUID = 0;
+            me->SetReactState(REACT_PASSIVE);
         }
 
         void EnterCombat(Unit *pWho)
         {
+            me->SetReactState(REACT_AGGRESSIVE);
             m_uiTargetGUID = pWho->GetGUID();
             DoCast(pWho, SPELL_MARK);
             me->SetSpeed(MOVE_RUN, 0.5f);
