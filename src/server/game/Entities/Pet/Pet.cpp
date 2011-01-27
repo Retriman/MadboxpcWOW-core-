@@ -859,6 +859,20 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         else
             scale = cFamily->minScale + float(getLevel() - cFamily->minScaleLevel) / cFamily->maxScaleLevel * (cFamily->maxScale - cFamily->minScale);
 
+        // some creatures have 3x scale
+        switch (cinfo->family)
+        {
+            case CREATURE_FAMILY_CHIMAERA:
+            case CREATURE_FAMILY_SPIDER:
+            case CREATURE_FAMILY_DEVILSAUR:
+            case CREATURE_FAMILY_CORE_HOUND:
+            case CREATURE_FAMILY_RHINO:
+                scale *= 3.0f;
+                break;
+            default:
+                break;
+        }
+
         SetFloatValue(OBJECT_FIELD_SCALE_X, scale);
     }
 
