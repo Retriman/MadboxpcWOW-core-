@@ -2219,6 +2219,22 @@ DurabilityLossChance.Parry = 0.05
 
 DurabilityLossChance.Block = 0.05
 
+# PvPRank.Rate.ExtraHonor
+# Rate of honor bonus for killing higher pvp ranked players
+# Default: 1 - 10% more honor per rank difference
+# 		   2 - 20% (Not Blizlike)
+#          0 - off
+
+PvPRank.Rate.ExtraHonor = 0
+
+# PvPRank.HKPerRank
+# Honor Kills needed for each rank, use "," between values.
+# Whole string must be enclosed with " "
+# Always specify 14 values, for 14 ranks
+#  		Default: "10,50,100,200,450,750,1300,2000,3500,6000,9500,15 000,21000,30000"
+
+PvPRank.HKPerRank = "10,50,100,200,450,750,1300,2000,3500,6000,9500,15 000,21000,30000"
+
 #
 #    Death.SicknessLevel
 #        Description: Starting level for resurrection sickness.
