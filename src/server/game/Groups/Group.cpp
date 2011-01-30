@@ -373,6 +373,7 @@ uint32 Group::RemoveMember(const uint64 &guid, const RemoveMethod &method /* = G
 
     // remove member and change leader (if need) only if strong more 2 members _before_ member remove (BG allow 1 member group)
     if (GetMembersCount() > (isBGGroup() ? 1u : 2u))
+    if (GetMembersCount() > (isBGGroup() ? 1u : 2u) || (method == 2 && GetMembersCount() > 1))
     {
         bool leaderChanged = _removeMember(guid);
 

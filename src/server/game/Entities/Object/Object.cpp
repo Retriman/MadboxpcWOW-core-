@@ -45,6 +45,7 @@
 #include "TemporarySummon.h"
 #include "Totem.h"
 #include "OutdoorPvPMgr.h"
+#include "BattlefieldMgr.h"
 
 uint32 GuidHigh2TypeId(uint32 guid_hi)
 {
@@ -2135,7 +2136,12 @@ void WorldObject::SetZoneScript()
         if (map->IsDungeon())
             m_zoneScript = (ZoneScript*)((InstanceMap*)map)->GetInstanceScript();
         else if (!map->IsBattlegroundOrArena())
-            m_zoneScript = sOutdoorPvPMgr->GetZoneScript(GetZoneId());
+        {
+            if (Battlefield* Bf = sBattlefieldMgr.GetBattlefieldToZoneId(GetZoneId()))
+                m_zoneScript = Bf;
+            else
+                m_zoneScript = sOutdoorPvPMgr->GetZoneScript(GetZoneId());
+        }
     }
 }
 
