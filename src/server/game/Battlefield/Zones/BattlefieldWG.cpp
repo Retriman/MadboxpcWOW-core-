@@ -44,13 +44,19 @@ bool BattlefieldWG::SetupBattlefield()
 
     //Load from db
     QueryResult resultDB = CharacterDatabase.Query("SELECT Timer, WarTime, DefenderTeam FROM battlefield WHERE id = 1");
-    if (!resultDB)
-        return false;
-
-    Field *fields = resultDB->Fetch();
-    m_Timer = fields[0].GetUInt32();
-    m_WarTime = fields[1].GetBool();
-    m_DefenderTeam = TeamId(fields[2].GetInt8());
+    if (resultDB)
+    {
+        Field *fields = resultDB->Fetch();
+        m_Timer = fields[0].GetUInt32();
+        m_WarTime = fields[1].GetBool();
+        m_DefenderTeam = TeamId(fields[2].GetInt8());
+    }
+    else
+    {
+        m_Timer = m_NoWarBattleTime;
+        m_WarTime = 0;
+        m_DefenderTeam = TEAM_ALLIANCE;
+    }
 
     for (int i=0;i<BATTLEFIELD_WG_GY_MAX;i++)
     {
@@ -273,7 +279,13 @@ void BattlefieldWG::OnBattleEnd(bool endbytimer)
     for (GuidSet::const_iterator itr = m_PlayersInWar[GetDefenderTeam()].begin(); itr != m_PlayersInWar[GetDefenderTeam()].end(); ++itr)
         if (Player* plr=sObjectMgr->GetPlayer((*itr)))
             plr->AddAura(58045,plr);
+  
+    for (uint32 team = 0; team < 2; ++team)
+        for (PlayerSet::const_iterator p_itr = m_players[team].begin(); p_itr != m_players[team].end(); ++p_itr)
+            SendInitWorldStatesTo(*p_itr);
     
+    // Warning message
+    SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_WIN_KEEP); 
     m_PlayersInWar[0].clear();
     m_PlayersInWar[1].clear();
 }

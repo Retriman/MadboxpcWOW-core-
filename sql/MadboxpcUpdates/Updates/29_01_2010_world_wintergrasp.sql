@@ -64,3 +64,5 @@ CREATE TABLE `battlefield`(
    `DefenderTeam` INT DEFAULT '0',
    PRIMARY KEY (`id`)
 );
+
+UPDATE `trinity_string` SET `content_default` = 'The Wintergrasp fortress has been captured by %s !', `content_loc2` = '%s a captur? la forteresse du Joug d''hiver !' WHERE `entry` =12072;
