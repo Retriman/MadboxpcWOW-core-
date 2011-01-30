@@ -56,16 +56,13 @@ DELETE FROM `creature` where `id` in (30739,30740,31102,31841,31151,31153,32296,
 UPDATE `creature_template` SET `ScriptName` = 'npc_wg_spiritguide' WHERE `entry` IN (31841,31842);
 UPDATE `creature_template` SET `ScriptName` = 'npc_demolisher_engineerer' WHERE `entry` IN (30400,30499);
 
-DROP TABLE IF EXISTS `battlefield`;
-CREATE TABLE `battlefield`(
-   `id` INT NOT NULL AUTO_INCREMENT,
-   `Timer` INT DEFAULT '60000',
-   `Wartime` BOOLEAN DEFAULT '0',
-   `DefenderTeam` INT DEFAULT '0',
-   PRIMARY KEY (`id`)
-);
 
 UPDATE `trinity_string` SET `content_default` = 'The Wintergrasp fortress has been captured by %s !', `content_loc2` = '%s a captur? la forteresse du Joug d''hiver !' WHERE `entry` =12072;
 DELETE FROM `creature` where `id`= 30400 AND `map`=571;
 DELETE FROM `gameobject` where `id` in (192273, 192274, 192277, 192280, 192283, 192289, 192290, 192338, 192339, 192406, 192407, 192414, 192417, 192418, 192429, 192433, 192434, 192435, 192458, 192459, 192460, 192461) AND `map`=571;
 DELETE FROM `gameobject` where `id` = 192819  AND `map`=571;
+
+-- Horde
+UPDATE `creature` SET `phaseMask` = 1 WHERE `id` IN (30739, 31101, 31151, 31091, 31102, 32296, 31106, 31053, 39173);
+-- Alliance
+UPDATE `creature` SET `phaseMask` = 1 WHERE `id` IN (31054, 31052, 31036, 39172, 30489, 31109, 31108, 31051, 31153);
