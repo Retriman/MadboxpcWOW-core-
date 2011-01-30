@@ -201,7 +201,7 @@ bool Battlefield::Update(uint32 diff)
     {
         if (m_saveTimer <= diff)
         {
-            CharacterDatabase.PExecute("UPDATE battlefield SET Timer = '%u', WarTime = '%u', DefenderTeam = '%u' WHERE guid = '%u'",m_Timer,m_WarTime,m_DefenderTeam,1); 
+            CharacterDatabase.PExecute("UPDATE battlefield SET Timer = '%u', WarTime = '%u', DefenderTeam = '%u' WHERE id = '%u'", m_Timer, m_WarTime, m_DefenderTeam,1);
             m_saveTimer = 60 * IN_MILLISECONDS;
         }
         else 
