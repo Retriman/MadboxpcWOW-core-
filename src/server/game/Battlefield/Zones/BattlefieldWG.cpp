@@ -300,36 +300,42 @@ void BattlefieldWG::OnCreatureCreate(Creature *creature, bool add)
             {
                 if(team == TEAM_HORDE )
                 {
-                	if(GetData(BATTLEFIELD_WG_DATA_VEHICLE_H) < GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H))
-                	{
-                		m_vehicles[team].insert(creature);
-                		UpdateVehicleCountWG();
-                	}
-                	else
-                	{
-                		creature->setDeathState(DEAD);
-                		creature->SetRespawnTime(RESPAWN_ONE_DAY);
-                		return;
-                	}
+                    if(GetData(BATTLEFIELD_WG_DATA_VEHICLE_H) < GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H))
+                    {
+                        m_vehicles[team].insert(creature);
+                        m_Data32[BATTLEFIELD_WG_DATA_VEHICLE_H]++;
+                        UpdateVehicleCountWG();
+                    }
+                    else
+                    {
+                        creature->setDeathState(DEAD);
+                        creature->SetRespawnTime(RESPAWN_ONE_DAY);
+                        return;
+                    }
                 }
                 else
                 {
-                        if(GetData(BATTLEFIELD_WG_DATA_VEHICLE_A) < GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A) )
-                	{
-                    		m_vehicles[team].insert(creature);
-                    		UpdateVehicleCountWG();
-                	}
-                	else
-                	{
-                    		creature->setDeathState(DEAD);
-                    		creature->SetRespawnTime(RESPAWN_ONE_DAY);
-                    		return;
-                	}
+                    if(GetData(BATTLEFIELD_WG_DATA_VEHICLE_A) < GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A) )
+                    {
+                        m_vehicles[team].insert(creature);
+                        m_Data32[BATTLEFIELD_WG_DATA_VEHICLE_A]++;
+                        UpdateVehicleCountWG();
+                    }
+                    else
+                    {
+                        creature->setDeathState(DEAD);
+                        creature->SetRespawnTime(RESPAWN_ONE_DAY);
+                        return;
+                    }
                 }
             }
             else
             {
                 m_vehicles[team].erase(creature);
+                if (team == TEAM_HORDE)
+                    m_Data32[BATTLEFIELD_WG_DATA_VEHICLE_H]--;
+                else
+                    m_Data32[BATTLEFIELD_WG_DATA_VEHICLE_A]--; 
                 UpdateVehicleCountWG();
             }
             break;

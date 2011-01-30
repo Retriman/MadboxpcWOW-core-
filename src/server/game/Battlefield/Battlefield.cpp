@@ -58,11 +58,11 @@ Battlefield::~Battlefield()
 {
 }
 
-void Battlefield::HandlePlayerEnterZone(Player* plr,uint32 zone)
+void Battlefield::HandlePlayerEnterZone(Player* plr, uint32 /*zone*/)
 {
-    //If battle is start, 
-    //  if it not fully > invite player to join the war
-    //  if it fully > announce to player that BF is full and kick after few second if he dont leave
+    // If battle is start, 
+    // If it not fully > invite player to join the war
+    // If it fully > announce to player that BF is full and kick after few second if he dont leave
     if(IsWarTime())
     {
         if(m_PlayersInWar[plr->GetTeamId()].size()+m_InvitedPlayers[plr->GetTeamId()].size() < m_MaxPlayer) //Not fully
@@ -89,7 +89,7 @@ void Battlefield::HandlePlayerEnterZone(Player* plr,uint32 zone)
 }
 
 //Called when a player leave the zone
-void Battlefield::HandlePlayerLeaveZone(Player* plr,uint32 zone)
+void Battlefield::HandlePlayerLeaveZone(Player* plr, uint32 /*zone*/)
 {
     if(IsWarTime())
     {
@@ -121,6 +121,7 @@ void Battlefield::HandlePlayerLeaveZone(Player* plr,uint32 zone)
     RemovePlayerFromResurrectQueue(plr->GetGUID());
     OnPlayerLeaveZone(plr);//For scripting
 }
+
 bool Battlefield::Update(uint32 diff)
 {
     //When global timer is end
@@ -575,7 +576,6 @@ WorldSafeLocsEntry const* Battlefield::GetClosestGraveYard(Player* plr)
 
 void Battlefield::AddPlayerToResurrectQueue(uint64 npc_guid, uint64 player_guid)
 {
-    bool foundPlayer = false;
     for(int i=0;i<m_GraveYardList.size();i++)
     {
         if(!m_GraveYardList[i])
@@ -591,7 +591,6 @@ void Battlefield::AddPlayerToResurrectQueue(uint64 npc_guid, uint64 player_guid)
 
 void Battlefield::RemovePlayerFromResurrectQueue(uint64 player_guid)
 {
-    bool foundPlayer = false;
     for(int i=0;i<m_GraveYardList.size();i++)
     {
         if(!m_GraveYardList[i])
@@ -820,10 +819,16 @@ GameObject* Battlefield::SpawnGameObject(uint32 entry, float x, float y, float z
 //*****************************************************
 
 BfCapturePoint::BfCapturePoint(Battlefield* Bf)
-: m_Bf(Bf), m_value(0), m_maxValue(0), m_team(TEAM_NEUTRAL),
-m_State(BF_CAPTUREPOINT_OBJECTIVESTATE_NEUTRAL), m_OldState(BF_CAPTUREPOINT_OBJECTIVESTATE_NEUTRAL), m_capturePointEntry(0), m_neutralValuePct(0),
-m_maxSpeed(0), m_capturePoint(NULL)
+: m_Bf(Bf), m_capturePoint(NULL)
 {
+    m_team = TEAM_NEUTRAL;
+    m_value = 0;
+    m_maxValue = 0;
+    m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_NEUTRAL ;
+    m_OldState = BF_CAPTUREPOINT_OBJECTIVESTATE_NEUTRAL;
+    m_capturePointEntry = 0;
+    m_neutralValuePct = 0;
+    m_maxSpeed = 0; 
 }
 
 bool BfCapturePoint::HandlePlayerEnter(Player * plr)
