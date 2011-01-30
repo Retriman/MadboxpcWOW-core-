@@ -42,15 +42,20 @@ bool BattlefieldWG::SetupBattlefield()
     // Init GraveYards
     SetGraveyardNumber(BATTLEFIELD_WG_GY_MAX);
 
-    //TODO: Load from db
-    m_Timer = 1*60*1000;
-    m_WarTime = false;
-    m_DefenderTeam = TEAM_HORDE;
+    //Load from db
+    QueryResult resultDB = CharacterDatabase.Query("SELECT Timer, WarTime, DefenderTeam FROM battlefield WHERE id = 1");
+    if (!resultDB)
+        return false;
 
-    for(int i=0;i<BATTLEFIELD_WG_GY_MAX;i++)
+    Field *fields = resultDB->Fetch();
+    m_Timer = fields[0].GetUInt32();
+    m_WarTime = fields[1].GetBool();
+    m_DefenderTeam = TeamId(fields[2].GetInt8());
+
+    for (int i=0;i<BATTLEFIELD_WG_GY_MAX;i++)
     {
         BfGraveYardWG* gy = new BfGraveYardWG(this);
-        if(WGGraveYard[i].startcontrol==TEAM_NEUTRAL)
+        if (WGGraveYard[i].startcontrol==TEAM_NEUTRAL)
         {
             //In no war time Gy is control by defender
             gy->Init(31841,31842,WGGraveYard[i].x,WGGraveYard[i].y,WGGraveYard[i].z,WGGraveYard[i].o,m_DefenderTeam,WGGraveYard[i].gyid);
@@ -63,7 +68,7 @@ bool BattlefieldWG::SetupBattlefield()
 
 
     //Pop des gameobject et creature du workshop
-    for(int i=0;i<WG_MAX_WORKSHOP;i++)
+    for (int i=0;i<WG_MAX_WORKSHOP;i++)
     {
         BfWGWorkShopData* ws=new BfWGWorkShopData(this);//Create new object
         //Init:setup variable
@@ -76,7 +81,7 @@ bool BattlefieldWG::SetupBattlefield()
             ws->AddGameObject(WGWorkShopDataBase[i].GameObjectData[g]);
 
         //Create PvPCapturePoint
-        if( WGWorkShopDataBase[i].type < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST )
+        if (WGWorkShopDataBase[i].type < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST )
         {
             ws->ChangeControl(GetAttackerTeam(),true);//Update control of this point 
             //Create Object

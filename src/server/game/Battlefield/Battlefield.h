@@ -282,6 +282,7 @@ protected:
     uint32 m_NoWarBattleTime;//Time between to battle
     uint32 m_TimeForAcceptInvite;
     uint32 m_uiKickDontAcceptTimer;
+    uint32 m_saveTimer;
     WorldLocation KickPosition;
  
     uint32 m_uiKickAfkTimer;
