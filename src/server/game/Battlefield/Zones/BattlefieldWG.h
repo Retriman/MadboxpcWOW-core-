@@ -28,7 +28,7 @@ const uint32 WG_MARK_OF_HONOR = 43589;
 const uint32 VehNumWorldState[2] = {3680,3490};
 const uint32 MaxVehNumWorldState[2] = {3681,3491};
 const uint32 ClockWorldState[2] = {3781,4354};
-const uint32 WintergraspFaction[3] = {1732, 1735, 35};
+const uint32 WintergraspFaction[3] = {1802, 1801, 35};
 
 class BattlefieldWG;
 class BfCapturePointWG;
@@ -133,7 +133,7 @@ struct BfWGCoordGY
     float o;
     uint32 gyid;
     uint8 type;
-   uint32 textid;//for gossip menu
+    uint32 textid;//for gossip menu
     TeamId startcontrol;
 };
 
@@ -164,6 +164,7 @@ public:
 protected:
     BfWGWorkShopData* m_WorkShop;
 };
+
 /*#########################
 * WinterGrasp Battlefield *
 #########################*/
@@ -187,6 +188,8 @@ public:
 
     bool CanClickOnOrb() {return m_bCanClickOnOrb;}
     void AllowToClickOnOrb(bool allow) {m_bCanClickOnOrb = allow;}
+
+    void RewardMarkOfHonor(Player *plr, uint32 count);
     
     void UpdateVehicleCountWG();
 
@@ -366,7 +369,6 @@ const BfWGBuildingSpawnData WGGameObjectBuillding[WG_MAX_OBJ] =
     {191810, 3773, 5397.11f, 2841.54f, 425.899f, 3.14159f,  BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST, 0},
 };
 
-
 //*********************************************************
 //**********Keep Element(GameObject,Creature)**************
 //*********************************************************
@@ -401,7 +403,7 @@ const BfWGObjectPosition WGKeepGameObject[WG_KEEPGAMEOBJECT_MAX]={
 	{5322.020020f, 2781.129883f, 435.811005f, 1.570800f, 192378, 192416}, // Flag on wall intersect
 	{5288.919922f, 2820.219971f, 435.721008f, 0.017452f, 192355, 192416}, // Flag on wall intersect
 	{5288.410156f, 2861.790039f, 435.721008f, 0.017452f, 192354, 192416}, // Flag on wall intersect
-	{5322.229980f, 2899.429932f, 435.808014f, -1.58825f, 192358, 192416}, // Flag on wall intersect
+    {5322.229980f, 2899.429932f, 435.808014f, -1.58825f, 192358, 192416}, // Flag on wall intersect
 	{5364.350098f, 2899.399902f, 435.838989f, -1.57080f, 192359, 192416}, // Flag on wall intersect
 	{5397.759766f, 2873.080078f, 455.460999f, 3.106650f, 192338, 192416}, // Flag on keep
 	{5397.390137f, 2809.330078f, 455.343994f, 3.106650f, 192339, 192416}, // Flag on keep
@@ -428,6 +430,7 @@ struct BfWGTurretPos
     float z;
     float o;
 };
+
 #define WG_MAX_TURRET 23
 const BfWGTurretPos WGTurret[WG_MAX_TURRET]=
 {
@@ -455,7 +458,6 @@ const BfWGTurretPos WGTurret[WG_MAX_TURRET]=
     {5148.8f, 2820.24f, 421.621f, 3.16043f},
     {5147.98f, 2861.93f, 421.63f, 3.18792f},
 };
-
 
 //Here there is all npc keeper spawn point
 #define WG_MAX_KEEP_NPC 38
@@ -517,6 +519,7 @@ struct BfWGWGTeleporterData
     float z;        //  --
     float o;        //  --
 };
+
 #define WG_MAX_TELEPORTER 10
 const BfWGWGTeleporterData WGPortalDefenderData[WG_MAX_TELEPORTER] = 
 {
@@ -536,7 +539,8 @@ const BfWGWGTeleporterData WGPortalDefenderData[WG_MAX_TELEPORTER] =
 //**********Tower Element(GameObject,Creature)*************
 //*********************************************************
 
-struct BfWGTowerData {
+struct BfWGTowerData 
+{
 	uint32 towerentry; //Gameobject id of tower // TODO: needed ? 
 	uint8 nbObject; //Number of gameobject spawned on this point
 	BfWGObjectPosition GameObject[6];//Gameobject position and entry (Horde/Alliance)
@@ -547,7 +551,8 @@ struct BfWGTowerData {
     BfWGObjectPosition CreatureTop[5]; // tor creature 
 };
 
-const BfWGTowerData AttackTowers[3]={
+const BfWGTowerData AttackTowers[3]=
+{
 	//Tower west
     {
         190356,
@@ -602,7 +607,7 @@ const BfWGTowerData AttackTowers[3]={
 			{4412.290039f, 2753.790039f, 401.015015f, 5.829400f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A},// Standing Guard
 			{4421.939941f, 2773.189941f, 400.894989f, 5.707230f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A},// Standing Guard
 			{0			, 0			 , 0 	     , 0	   , 0    , 0    },
-			{0			, 0			 , 0 	     , 0	   , 0    , 0    },
+     		{0			, 0			 , 0 	     , 0	   , 0    , 0    },
 			{0			, 0			 , 0 	     , 0	   , 0    , 0    },
         },
         0,
@@ -633,7 +638,7 @@ const BfWGTowerData AttackTowers[3]={
 			{4494.580078f, 1943.760010f, 435.627014f, 6.195920f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A},// Standing Guard
 			{4450.149902f, 1897.579956f, 435.045013f, 4.398230f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A},// Standing Guard
 			{4428.870117f, 1906.869995f, 432.648010f, 3.996800f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A},// Standing Guard
-		{0			, 0			 , 0 	     , 0	   , 0    , 0    },
+			{0			, 0			 , 0 	     , 0	   , 0    , 0    },
 			{0			, 0			 , 0 	     , 0	   , 0    , 0    },
 			{0			, 0			 , 0 	     , 0	   , 0    , 0    },
 			{0			, 0			 , 0 	     , 0	   , 0    , 0    },
@@ -688,12 +693,12 @@ const BfWGWorkShopDataBase WGWorkShopDataBase[WG_MAX_WORKSHOP]=
         6,
         //gameobject
         {
-            {4778.189f,2438.060f,345.644f,-2.940f,192280,192274},
-            {5024.569f,2532.750f,344.023f,-1.937f,192280,192274},
-            {4811.399f,2441.899f,358.207f,-2.003f,192435,192406},
-            {4805.669f,2407.479f,358.191f, 1.780f,192435,192406},
-            {5004.350f,2486.360f,358.449f, 2.172f,192435,192406},
-            {4983.279f,2503.090f,358.177f,-0.427f,192435,192406},
+            {4778.189f, 2438.060f, 345.644f, -2.940f, 192280,192274},
+            {5024.569f, 2532.750f, 344.023f, -1.937f, 192280,192274},
+            {4811.399f, 2441.899f, 358.207f, -2.003f, 192435,192406},
+            {4805.669f, 2407.479f, 358.191f, 1.780f, 192435,192406},
+            {5004.350f, 2486.360f, 358.449f, 2.172f, 192435,192406},
+            {4983.279f, 2503.090f, 358.177f, -0.427f, 192435,192406},
             {0,0,0,0,0,0},
             {0,0,0,0,0,0},
             {0,0,0,0,0,0},
@@ -745,7 +750,7 @@ const BfWGWorkShopDataBase WGWorkShopDataBase[WG_MAX_WORKSHOP]=
             {4413.430176f, 2393.449951f, 376.359985f, 1.064650f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A},
             {4388.129883f, 2411.979980f, 374.743011f, 1.640610f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A},
             {4349.540039f, 2411.260010f, 374.743011f, 2.059490f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A},
-            {4357.669922f, 2357.989990f, 382.006989f, 1.675520f, 30400, 30499},
+           {4357.669922f, 2357.989990f, 382.006989f, 1.675520f, 30400, 30499},
             {0,0,0,0,0,0}
         },
         2,
@@ -862,6 +867,7 @@ const BfWGWorkShopDataBase WGWorkShopDataBase[WG_MAX_WORKSHOP]=
 };
 
 //*********************************
+
 //********************************************************************
 //*                Structs using for Building,Graveyard,Workshop         *
 //********************************************************************
@@ -913,23 +919,23 @@ struct BfWGGameObjectBuilding
     {
         switch(m_Type)
         {
-        case BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER:
-        case BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST:
-        case BATTLEFIELD_WG_OBJECTTYPE_DOOR:
-        case BATTLEFIELD_WG_OBJECTTYPE_WALL:
-            m_Team=m_WG->GetDefenderTeam();//Object of Keep has defender faction
-            break;
-        case BATTLEFIELD_WG_OBJECTTYPE_TOWER:
-            m_Team=m_WG->GetAttackerTeam();//Tower in south are for attacker
-            break;
-        default: 
-            m_Team=TEAM_NEUTRAL;
-            break;
+            case BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER:
+            case BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST:
+            case BATTLEFIELD_WG_OBJECTTYPE_DOOR:
+            case BATTLEFIELD_WG_OBJECTTYPE_WALL:
+                m_Team=m_WG->GetDefenderTeam();//Object of Keep has defender faction
+                break;
+            case BATTLEFIELD_WG_OBJECTTYPE_TOWER:
+                m_Team=m_WG->GetAttackerTeam();//Tower in south are for attacker
+                break;
+            default: 
+                m_Team=TEAM_NEUTRAL;
+                break;
         }
 
         //Rebuild gameobject
         m_Build->Rebuild();
-       //Updating worldstate
+        //Updating worldstate
         m_State=BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT-(m_Team*3);
         m_WG->SendUpdateWorldState(m_WorldState,m_State);
         m_Build->SetUInt32Value(GAMEOBJECT_FACTION,WintergraspFaction[m_Team]);
@@ -947,11 +953,6 @@ struct BfWGGameObjectBuilding
 
         for (CreatureSet::const_iterator itr = m_CreatureTopList[m_WG->GetAttackerTeam()].begin(); itr != m_CreatureTopList[m_WG->GetAttackerTeam()].end(); ++itr)
             m_WG->HideNpc(*itr);
-
-        if(m_Type==BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER)
-            m_WG->AddDamagedTower(m_WG->GetDefenderTeam());
-        else if (m_Type==BATTLEFIELD_WG_OBJECTTYPE_TOWER)
-            m_WG->AddDamagedTower(m_WG->GetAttackerTeam());
     }
     
     //Called when associate gameobject is destroy
@@ -996,18 +997,18 @@ struct BfWGGameObjectBuilding
         m_NameId = nameid;
         switch(m_Type)
         {
-        case BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER:
-        case BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST:
-        case BATTLEFIELD_WG_OBJECTTYPE_DOOR:
-        case BATTLEFIELD_WG_OBJECTTYPE_WALL:
-            m_Team=m_WG->GetDefenderTeam();//Object of Keep has defender faction
-            break;
-        case BATTLEFIELD_WG_OBJECTTYPE_TOWER:
-            m_Team=m_WG->GetAttackerTeam();//Tower in south are for attacker
-            break;
-        default: 
-            m_Team=TEAM_NEUTRAL;
-            break;
+            case BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER:
+            case BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST:
+            case BATTLEFIELD_WG_OBJECTTYPE_DOOR:
+            case BATTLEFIELD_WG_OBJECTTYPE_WALL:
+                m_Team=m_WG->GetDefenderTeam();//Object of Keep has defender faction
+                break;
+            case BATTLEFIELD_WG_OBJECTTYPE_TOWER:
+                m_Team=m_WG->GetAttackerTeam();//Tower in south are for attacker
+                break;
+            default: 
+                m_Team=TEAM_NEUTRAL;
+                break;
         }
         m_State=sWorld->getWorldState(m_WorldState);
         switch (m_State)
@@ -1038,15 +1039,15 @@ struct BfWGGameObjectBuilding
         int32 towerid = -1;
 	    switch(go->GetEntry())
 	    {
-		case 190356:
-			towerid=0;
-			break;
-		case 190357:
-			towerid=1;
-			break;
-		case 190358:
-			towerid=2;
-			break;
+		    case 190356:
+			    towerid=0;
+			    break;
+		    case 190357:
+			    towerid=1;
+			    break;
+		    case 190358:
+			    towerid=2;
+			    break;
 	    }
 	    if(towerid>=0)
 	    {
@@ -1080,8 +1081,6 @@ struct BfWGGameObjectBuilding
             }
             UpdateCreatureAndGo();
         }
-
-        
     }
 
     void UpdateCreatureAndGo()
@@ -1139,12 +1138,12 @@ struct BfWGWorkShopData
     void AddCreature(BfWGObjectPosition obj)
     {
         if(Creature* creature = m_WG->SpawnCreature(obj.entryh, obj.x, obj.y, obj.z, obj.o, TEAM_HORDE))
-        	m_CreatureOnPoint[TEAM_HORDE].insert(creature);
+            m_CreatureOnPoint[TEAM_HORDE].insert(creature);
 
         if(Creature* creature = m_WG->SpawnCreature(obj.entrya, obj.x, obj.y, obj.z, obj.o, TEAM_ALLIANCE))
-        	m_CreatureOnPoint[TEAM_ALLIANCE].insert(creature);
-
+            m_CreatureOnPoint[TEAM_ALLIANCE].insert(creature);
     }
+
     //Spawning Associate gameobject and store them
     void AddGameObject(BfWGObjectPosition obj)
     {
@@ -1191,7 +1190,6 @@ struct BfWGWorkShopData
                 //Hide Horde gameobject
                 for(GameObjectSet::const_iterator itr = m_GameObjectOnPoint[TEAM_HORDE].begin(); itr != m_GameObjectOnPoint[TEAM_HORDE].end(); ++itr)
                     (*itr)->SetRespawnTime(RESPAWN_ONE_DAY);
-
 
                 //Updating worldstate
                 m_State=BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT;
@@ -1268,10 +1266,10 @@ struct BfWGWorkShopData
         if(m_Type < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
             m_WG->GetGraveYardById(m_Type)->ChangeControl(TeamId(m_TeamControl));
     }
-
     void Save()
     {
         sWorld->setWorldState(m_WorldState,m_State);
     }
 };
+
 #endif

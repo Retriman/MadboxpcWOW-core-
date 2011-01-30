@@ -47,6 +47,12 @@ enum BfObjectiveStates
     BF_CAPTUREPOINT_OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE,
     BF_CAPTUREPOINT_OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE,
 };
+enum BattlefieldSounds
+{
+    BF_HORDE_WINS                = 8454,
+    BF_ALLIANCE_WINS             = 8455,
+    BF_START                     = 3439
+};
 
 // some class predefs
 class Player;
@@ -88,7 +94,7 @@ public:
 
     // returns true if the state of the objective has changed, in this case, the OutdoorPvP must send a world state ui update.
     virtual bool Update(uint32 diff);
-    virtual void ChangeTeam(TeamId /*oldTeam*/) {}
+    virtual void ChangeTeam(TeamId /*oldTeam*/) { }
     virtual void SendChangePhase();
 
     bool SetCapturePointData(uint32 entry, uint32 map, float x, float y, float z, float o);
@@ -119,6 +125,7 @@ protected:
     uint32 m_capturePointEntry;
     GameObject *m_capturePoint;
 };
+
 class BfGraveYard
 {
 public:
@@ -126,6 +133,7 @@ public:
 
     // method for change who control the graveyard
     void ChangeControl(TeamId team);
+
     TeamId GetControlTeamId() {return m_ControlTeam;}
     
     // use for found the nearest graveyard
@@ -150,6 +158,7 @@ protected:
     GuidSet m_ResurrectQueue;
     Battlefield* m_Bf;
 };
+
 class Battlefield : public ZoneScript
 {
     friend class BattlefieldMgr;
@@ -175,7 +184,7 @@ public:
     // send world state update to all players present in zone
     void SendUpdateWorldState(uint32 field, uint32 value);
 
-   //TODO // called by OutdoorPvPMgr, updates the objectives and if needed, sends new worldstateui information
+    //TODO // called by OutdoorPvPMgr, updates the objectives and if needed, sends new worldstateui information
     virtual bool Update(uint32 diff);
 
     void InvitePlayerInZoneToQueue();
@@ -255,6 +264,8 @@ public:
     GraveYardVect GetGraveYardVect() {return m_GraveYardList;}
 
     uint32 GetTimer() {return m_Timer;}
+
+    void PlaySoundToAll(uint32 SoundID);
 protected:
 	
     uint32 m_Timer;//Global timer for event

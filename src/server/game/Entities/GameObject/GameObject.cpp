@@ -818,6 +818,13 @@ bool GameObject::IsTransport() const
     return gInfo->type == GAMEOBJECT_TYPE_TRANSPORT || gInfo->type == GAMEOBJECT_TYPE_MO_TRANSPORT;
 }
 
+bool GameObject::IsDestructibleBuilding() const
+{
+    GameObjectInfo const * gInfo = GetGOInfo();
+    if (!gInfo) return false;
+    return gInfo->type == GAMEOBJECT_TYPE_DESTRUCTIBLE_BUILDING;
+}
+
 // is Dynamic transport = non-stop Transport
 bool GameObject::IsDynTransport() const
 {

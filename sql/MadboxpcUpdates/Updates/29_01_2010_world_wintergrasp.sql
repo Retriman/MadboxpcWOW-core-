@@ -66,3 +66,6 @@ CREATE TABLE `battlefield`(
 );
 
 UPDATE `trinity_string` SET `content_default` = 'The Wintergrasp fortress has been captured by %s !', `content_loc2` = '%s a captur? la forteresse du Joug d''hiver !' WHERE `entry` =12072;
+DELETE FROM `creature` where `id`= 30400 AND `map`=571;
+DELETE FROM `gameobject` where `id` in (192273, 192274, 192277, 192280, 192283, 192289, 192290, 192338, 192339, 192406, 192407, 192414, 192417, 192418, 192429, 192433, 192434, 192435, 192458, 192459, 192460, 192461) AND `map`=571;
+DELETE FROM `gameobject` where `id` = 192819  AND `map`=571;

@@ -199,7 +199,7 @@ bool Battlefield::Update(uint32 diff)
     {
         if (m_saveTimer <= diff)
         {  
-            CharacterDatabase.PExecute("UPDATE battlefield SET Timer = '%u', WarTime = '%u', DefenderTeam = '%u' WHERE id = '%u'", m_Timer, m_WarTime, m_DefenderTeam,1); 
+            CharacterDatabase.PExecute("UPDATE battlefield SET Timer = '%u', WarTime = '%u', DefenderTeam = '%u' WHERE id = '%u'",m_Timer,m_WarTime,m_DefenderTeam,GetBattleId());
             m_saveTimer = 60 * IN_MILLISECONDS;
         }
         else
@@ -312,12 +312,17 @@ void Battlefield::KickPlayerFromBf(uint64 guid)
 
 void Battlefield::StartBattle()
 {
+    if (m_WarTime)
+        return;
+
     m_Timer=m_BattleTime;
 
     m_WarTime = true;
 
     InvitePlayerInZoneToWar();
     InvitePlayerInQueueToWar();
+
+    PlaySoundToAll(BF_START);
 
     OnBattleStart();
 }
@@ -333,7 +338,28 @@ void Battlefield::EndBattle(bool endbytimer)
 
     if (!endbytimer)
         SetDefenderTeam(GetAttackerTeam());
-    OnBattleEnd(endbytimer);
+
+     if(GetDefenderTeam() == TEAM_ALLIANCE)
+        PlaySoundToAll(BF_ALLIANCE_WINS);// alliance wins sound
+	else
+        PlaySoundToAll(BF_HORDE_WINS);// horde wins sound
+    
+     OnBattleEnd(endbytimer);
+}
+
+void Battlefield::PlaySoundToAll(uint32 SoundID)
+{
+    WorldPacket data;
+    data.Initialize(SMSG_PLAY_SOUND, 4);
+    data << uint32(SoundID);
+
+    for(int team=0;team<2;team++)
+        for (GuidSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
+        {
+            Player* plr = sObjectMgr->GetPlayer((*itr));
+            if (plr)
+                plr->GetSession()->SendPacket(&data);
+        }
 }
 
 bool Battlefield::HasPlayer(Player *plr) const

@@ -51,6 +51,12 @@ bool BattlefieldWG::SetupBattlefield()
         m_Timer = fields[0].GetUInt32();
         m_WarTime = fields[1].GetBool();
         m_DefenderTeam = TeamId(fields[2].GetInt8());
+        
+        if(m_WarTime)
+        {
+            m_WarTime = false;
+            m_Timer = 10 * 60 * 1000;
+        }
     }
     else
     {
@@ -160,7 +166,7 @@ bool BattlefieldWG::SetupBattlefield()
      {
          if(GameObject* go=SpawnGameObject(WGKeepGameObject[i].entryh,WGKeepGameObject[i].x, WGKeepGameObject[i].y, WGKeepGameObject[i].z, WGKeepGameObject[i].o))
          {
-        	 go->SetRespawnTime(GetDefenderTeam()?RESPAWN_ONE_DAY:RESPAWN_IMMEDIATELY);
+             go->SetRespawnTime(GetDefenderTeam()?RESPAWN_ONE_DAY:RESPAWN_IMMEDIATELY);
              m_KeepGameObject[1].insert(go);
          }
          if(GameObject* go=SpawnGameObject(WGKeepGameObject[i].entrya,WGKeepGameObject[i].x, WGKeepGameObject[i].y, WGKeepGameObject[i].z, WGKeepGameObject[i].o))
@@ -170,8 +176,11 @@ bool BattlefieldWG::SetupBattlefield()
          }
      }
 
-    if(m_WarTime)
-        StartBattle();
+    for(GameObjectSet::const_iterator itr = m_KeepGameObject[GetDefenderTeam()].begin(); itr != m_KeepGameObject[GetDefenderTeam()].end(); ++itr)
+        (*itr)->SetRespawnTime(RESPAWN_IMMEDIATELY);
+     
+    for(GameObjectSet::const_iterator itr = m_KeepGameObject[GetAttackerTeam()].begin(); itr != m_KeepGameObject[GetAttackerTeam()].end(); ++itr)
+        (*itr)->SetRespawnTime(RESPAWN_ONE_DAY);
 
     return true;
 }
@@ -242,13 +251,12 @@ void BattlefieldWG::OnBattleEnd(bool endbytimer)
         
     if(!endbytimer){
         //Change all npc in keep
-        for(CreatureSet::const_iterator itr = KeepCreature[GetAttackerTeam()].begin(); itr != KeepCreature[GetAttackerTeam()].end(); ++itr)
+       for(CreatureSet::const_iterator itr = KeepCreature[GetAttackerTeam()].begin(); itr != KeepCreature[GetAttackerTeam()].end(); ++itr)
             HideNpc(*itr);
         
         for(CreatureSet::const_iterator itr = KeepCreature[GetDefenderTeam()].begin(); itr != KeepCreature[GetDefenderTeam()].end(); ++itr)
             ShowNpc(*itr,true);
     }
-
     // Update all graveyard, control is to defender when no wartime
     for(int i=0;i<BATTLEFIELD_WG_GY_HORDE;i++)
     {
@@ -261,7 +269,7 @@ void BattlefieldWG::OnBattleEnd(bool endbytimer)
     for(GameObjectSet::const_iterator itr = m_KeepGameObject[GetDefenderTeam()].begin(); itr != m_KeepGameObject[GetDefenderTeam()].end(); ++itr)
         (*itr)->SetRespawnTime(RESPAWN_IMMEDIATELY);
 
-    for(GameObjectSet::const_iterator itr = m_KeepGameObject[GetAttackerTeam()].begin(); itr != m_KeepGameObject[GetAttackerTeam()].end(); ++itr)
+   for(GameObjectSet::const_iterator itr = m_KeepGameObject[GetAttackerTeam()].begin(); itr != m_KeepGameObject[GetAttackerTeam()].end(); ++itr)
         (*itr)->SetRespawnTime(RESPAWN_ONE_DAY);
 
     //Update portal defender faction
@@ -274,6 +282,51 @@ void BattlefieldWG::OnBattleEnd(bool endbytimer)
     for(WorkShop::const_iterator itr = WorkShopList.begin(); itr != WorkShopList.end(); ++itr)
         (*itr)->Save();
 
+    uint32 WinerHonor = 0;
+    uint32 LooserHonor = 0;
+
+    if(!endbytimer)
+    {
+        WinerHonor =  3000 + 400 * m_Data32[BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT] + 100 * m_Data32[BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT];
+        LooserHonor = 1000 + 400 * m_Data32[BATTLEFIELD_WG_DATA_BROKEN_TOWER_DEF] + 100 * m_Data32[BATTLEFIELD_WG_DATA_DAMAGED_TOWER_DEF];
+    }
+    else
+    {
+        WinerHonor =  3000 + 400 * m_Data32[BATTLEFIELD_WG_DATA_BROKEN_TOWER_DEF] + 100 * m_Data32[BATTLEFIELD_WG_DATA_DAMAGED_TOWER_DEF];
+        LooserHonor = 1000 + 400 * m_Data32[BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT] + 100 * m_Data32[BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT];
+    }
+
+    for (GuidSet::const_iterator itr = m_PlayersInWar[GetDefenderTeam()].begin(); itr != m_PlayersInWar[GetDefenderTeam()].end(); ++itr)
+        if (Player* plr=sObjectMgr->GetPlayer((*itr)))
+        {
+            plr->AddAura(58045,plr);
+            if(plr->HasAura(SPELL_LIEUTENANT))
+            {
+            	 plr->RewardHonor(NULL, 1, WinerHonor);
+             	 RewardMarkOfHonor(plr, 3);
+            }
+            else if(plr->HasAura(SPELL_CORPORAL))
+            {
+                plr->RewardHonor(NULL, 1, WinerHonor);
+                RewardMarkOfHonor(plr, 2);
+            }
+        }
+
+    for (GuidSet::const_iterator itr = m_PlayersInWar[GetAttackerTeam()].begin(); itr != m_PlayersInWar[GetAttackerTeam()].end(); ++itr)
+        if (Player* plr=sObjectMgr->GetPlayer((*itr)))
+        {
+            if(plr->HasAura(SPELL_LIEUTENANT))
+            {
+            	 plr->RewardHonor(NULL, 1, LooserHonor);
+             	 RewardMarkOfHonor(plr, 1);
+            }
+            else if(plr->HasAura(SPELL_CORPORAL))
+            {
+            	 plr->RewardHonor(NULL, 1, LooserHonor);
+            	 RewardMarkOfHonor(plr, 1);
+            }
+        }
+
     for(int team=0;team<2;team++)
         for (GuidSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
             if (Player* plr=sObjectMgr->GetPlayer((*itr)))
@@ -285,10 +338,6 @@ void BattlefieldWG::OnBattleEnd(bool endbytimer)
                 if(plr->GetVehicle())
                     plr->GetVehicle()->RemoveAllPassengers();
             }
-
-    for (GuidSet::const_iterator itr = m_PlayersInWar[GetDefenderTeam()].begin(); itr != m_PlayersInWar[GetDefenderTeam()].end(); ++itr)
-        if (Player* plr=sObjectMgr->GetPlayer((*itr)))
-            plr->AddAura(58045,plr);
 
     for (uint32 team = 0; team < 2; ++team)
         for (PlayerSet::const_iterator p_itr = m_players[team].begin(); p_itr != m_players[team].end(); ++p_itr)
@@ -321,6 +370,29 @@ void BattlefieldWG::OnBattleEnd(bool endbytimer)
             ? BATTLEFIELD_WG_TEXT_ALLIANCE
             : BATTLEFIELD_WG_TEXT_HORDE));
     }
+}
+
+void BattlefieldWG::RewardMarkOfHonor(Player *plr, uint32 count)
+{
+    // 'Inactive' this aura prevents the player from gaining honor points and battleground tokens
+    if (count == 0)
+        return;
+ 
+    ItemPosCountVec dest;
+    uint32 no_space_count = 0;
+    uint8 msg = plr->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, WG_MARK_OF_HONOR, count, &no_space_count);
+
+    if (msg == EQUIP_ERR_ITEM_NOT_FOUND)
+    {
+        return;
+    }
+
+    if (msg != EQUIP_ERR_OK) // convert to possible store amount
+        count -= no_space_count;
+
+    if (count != 0 && !dest.empty()) // can add some
+        if (Item* item = plr->StoreNewItem(dest, WG_MARK_OF_HONOR, true, 0))
+            plr->SendNewItem(item, count, true, false);
 }
 
 void BattlefieldWG::OnStartGrouping()
@@ -587,6 +659,7 @@ void BattlefieldWG::AddBrokenTower(TeamId team)
              {
                  m_Timer-=600000;
              }
+             SendInitWorldStatesToAll();
          }
     }
     else
@@ -602,8 +675,13 @@ void BattlefieldWG::ProcessEvent(GameObject *obj, uint32 eventId)
         return;
 
     //On click on titan relic
-    if (obj->GetEntry() == BATTLEFIELD_WG_GAMEOBJECT_TITAN_RELIC && IsWarTime() && m_bCanClickOnOrb)
-        EndBattle(false);
+    if (obj->GetEntry() == BATTLEFIELD_WG_GAMEOBJECT_TITAN_RELIC && IsWarTime())
+    {
+        if(m_bCanClickOnOrb)
+            EndBattle(false);
+        else
+            m_relic->SetRespawnTime(RESPAWN_IMMEDIATELY);
+    }
     
     //if destroy or damage event, search the wall/tower and update worldstate/send warning message
     for (GameObjectBuilding::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
