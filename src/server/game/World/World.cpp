@@ -71,7 +71,6 @@
 #include "CreatureTextMgr.h"
 #include "SmartAI.h"
 #include "Channel.h"
-#include "BattlefieldMgr.h"
 
 volatile bool World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
@@ -1698,10 +1697,6 @@ void World::SetInitialWorldSettings()
     sLog->outString("Starting Outdoor PvP System");
     sOutdoorPvPMgr->InitOutdoorPvP();
 
-    ///- Initialize Battlefield
-    sLog->outString("Starting Battlefield System");
-    sBattlefieldMgr.InitBattlefield();
-
     sLog->outString("Loading Transports...");
     sMapMgr->LoadTransports();
 
@@ -1954,9 +1949,6 @@ void World::Update(uint32 diff)
 
     sOutdoorPvPMgr->Update(diff);
     RecordTimeDiff("UpdateOutdoorPvPMgr");
-
-    sBattlefieldMgr.Update(diff);
-    RecordTimeDiff("BattlefieldMgr");
 
     ///- Delete all characters which have been deleted X days before
     if (m_timers[WUPDATE_DELETECHARS].Passed())

@@ -35,7 +35,6 @@
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 #include "ScriptMgr.h"
-#include "BattlefieldMgr.h"
 
 class Aura;
 //
@@ -5882,13 +5881,8 @@ void AuraEffect::HandleAuraDummy(AuraApplication const * aurApp, uint8 mode, boo
                         case 2584: // Waiting to Resurrect
                             // Waiting to resurrect spell cancel, we must remove player from resurrect queue
                             if (target->GetTypeId() == TYPEID_PLAYER)
-                            {
                                 if (Battleground *bg = target->ToPlayer()->GetBattleground())
                                     bg->RemovePlayerFromResurrectQueue(target->GetGUID());
-
-                                if (Battlefield *bf = sBattlefieldMgr.GetBattlefieldToZoneId(target->GetZoneId()))
-                                    bf->RemovePlayerFromResurrectQueue(target->GetGUID());
-                            }
                             break;
                         case 36730:                                     // Flame Strike
                         {
